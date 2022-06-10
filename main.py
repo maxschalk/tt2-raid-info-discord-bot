@@ -1,4 +1,4 @@
-from src.bot import bot
+from src import bot
 
 
 def main():

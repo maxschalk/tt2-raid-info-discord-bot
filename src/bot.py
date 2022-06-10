@@ -28,8 +28,10 @@ bot = commands.Bot(command_prefix=COMMAND_PREFIX)
 async def on_ready():
     print(f'{bot.user.name}#{bot.user.discriminator} has connected to Discord!')
 
-    guild: discord.Guild = discord.utils.get(bot.guilds, name=GUILD_NAME)
-    seeds_channel: discord.TextChannel = discord.utils.get(guild.text_channels, name="tt2-raid-rolls")
+    guild = discord.utils.get(bot.guilds, name=GUILD_NAME)
+    seeds_channel = discord.utils.get(
+        guild.text_channels, name="tt2-raid-rolls"
+    )
 
     if not guild or not seeds_channel:
         print("Did not connect to guild or text channels, closing bot client.")
