@@ -1,15 +1,19 @@
 import os
+from random import seed
 from typing import Optional
 
 import discord
+import requests
+from discord import Emoji
 from discord.ext import commands
 from dotenv import load_dotenv
 
+from src.actions import handle_existing_seed_messages
 from src.api_interface.Stage import Stage
 
 load_dotenv()
 
-STAGE = Stage.DEV
+STAGE = os.getenv('STAGE') or Stage.PRODUCTION
 
 API_AUTH_SECRET = os.getenv('API_AUTH_SECRET')
 
@@ -43,6 +47,12 @@ async def on_ready():
     global GUILD, SEEDS_CHANNEL
     GUILD = guild
     SEEDS_CHANNEL = seeds_channel
+
+    print("checking existing messages")
+
+    await handle_existing_seed_messages(seeds_channel)
+
+    await bot.close()
 
 
 @bot.event
