@@ -7,7 +7,7 @@ from src.api_interface.Stage import Stage
 
 load_dotenv()
 
-ENV_AUTH_SECRET = os.getenv("AUTH_SECRET")
+ENV_AUTH_SECRET = os.getenv("API_AUTH_SECRET")
 
 HEADERS = {"secret": ENV_AUTH_SECRET}
 

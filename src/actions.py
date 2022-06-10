@@ -1,19 +1,23 @@
+import json
 import re
-from itertools import takewhile
-from random import randint
+
+import requests
+
+from src.api_interface.make_request import make_request_sync
+from src.STAGE import STAGE
 
 AUTHOR_STR = "GameHive #raid-seed-export#0000"
-CONTENT_REGEX = "^Raid seed export - [0-9]{4}/[0-9]{2}/[0-9]{2}$"
+REGEX_CONTENT = re.compile("^Raid seed export - ([0-9]{4}/[0-9]{2}/[0-9]{2})$")
 
 EMOJI_CHECK_MARK = "✅"
 
 
 async def handle_existing_seed_messages(channel):
-    re_content = re.compile(CONTENT_REGEX)
-
     async for msg in channel.history():
-        relevant = (str(msg.author) == AUTHOR_STR
-                    and re_content.match(msg.content))
+        relevant = (
+            str(msg.author) == AUTHOR_STR
+            and REGEX_CONTENT.match(msg.content)
+        )
 
         if not relevant:
             continue
@@ -27,24 +31,33 @@ async def handle_existing_seed_messages(channel):
 
         print(msg.content)
 
-        # await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
+        if len(msg.attachments) != 1:
+            # Log warning
+            continue
 
-    return
+        a, *_ = msg.attachments
 
-    for i, msg in enumerate(msgs):
-        print(
-            f"{i} | {msg.author}: {msg.content} | {msg.reactions}\nattachments: {msg.attachments}"
+        data = requests.get(a.url).json()
+
+        filename = build_filename(msg.content)
+
+        response = make_request_sync(
+            method=requests.post,
+            path=f"admin/raw_seed_file/{filename}",
+            data=json.dumps(data),
+            stage=STAGE,
+            parse_response=False
         )
 
-    msg = seed_messages[0]
+        if response.status_code == 200:
+            await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
 
-    print(
-        f"{msg.author}: {msg.content} | {msg.reactions}\nattachments: {msg.attachments}"
-    )
 
-    await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
-    await msg.clear_reactions()
+def build_filename(s):
+    matches = REGEX_CONTENT.match(s)
 
-    # for a in msg.attachments:
-    #     data = requests.get(a.url).json()
-    #     print(data)
+    seed_date = matches.group(1).replace('/', '')
+
+    suffix = ".json"
+
+    return f"raid_seed_{seed_date}{suffix}"

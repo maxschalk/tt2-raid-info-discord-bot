@@ -9,11 +9,9 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from src.actions import handle_existing_seed_messages
-from src.api_interface.Stage import Stage
 
 load_dotenv()
 
-STAGE = os.getenv('STAGE') or Stage.PRODUCTION
 
 API_AUTH_SECRET = os.getenv('API_AUTH_SECRET')
 
