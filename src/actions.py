@@ -10,7 +10,7 @@ from src.constants import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK,
                            EMOJI_PENGUIN, EMOJI_RED_CROSS, REGEX_CONTENT,
                            SEED_AUTHOR)
 from src.STAGE import STAGE
-from src.utils import full_username, seed_data_filename
+from src.utils import full_username, message_from_response, seed_data_filename
 
 
 async def reaction_handled(reaction):
@@ -77,16 +77,12 @@ async def handle_message(msg):
     )
 
     if response.status_code != 201:
-        await throw_err_on_msg(
-            msg, f"{response.status_code=}: {response.text}"
-        )
+        await throw_err_on_msg(msg, message_from_response(response))
 
     response_data = response.json()
 
     if not response_data.get("created", False):
-        await throw_err_on_msg(
-            msg, f"File could not be created on server: {response_data.get('detail', response_data)}"
-        )
+        await throw_err_on_msg(msg, message_from_response(response))
 
     await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
 

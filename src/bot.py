@@ -19,7 +19,7 @@ from src.api_interface.BASE_URLS import BASE_URLS
 from src.api_interface.make_request import make_request_sync
 from src.api_interface.SeedType import SeedType
 from src.STAGE import STAGE
-from src.utils import full_username
+from src.utils import full_username, message_from_response
 
 load_dotenv()
 
@@ -114,7 +114,7 @@ async def get_server_files(context, count: int = None):
     )
 
     if response.status_code != 200:
-        await context.channel.send(f"{response.status_code=}: {response.text}")
+        await context.channel.send(message_from_response(response))
         return
 
     response_data = response.json()
@@ -146,7 +146,7 @@ async def download_server_file(context, filename: str, seed_type: SeedType = See
     )
 
     if response.status_code != 200:
-        await context.channel.send(f"{response.status_code=}: {response.text}")
+        await context.channel.send(message_from_response(response))
         return
 
     response_data = response.json()
@@ -157,7 +157,7 @@ async def download_server_file(context, filename: str, seed_type: SeedType = See
 
     except Exception as e:
         print(f"Error when fetching a file at command !server-file: {e}")
-        await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
+        await context.channel.send(message_from_response(response))
 
 
 @bot.command(name='delete-server-file', aliases=['dsf'])
@@ -177,13 +177,7 @@ async def delete_server_files(context, filename: str):
         parse_response=False
     )
 
-    if response.status_code != 200:
-        await context.channel.send(f"{response.status_code=}: {response.text}")
-        return
-
-    response_data = response.json()
-
-    await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
+    await context.channel.send(message_from_response(response))
 
 
 @bot.command(name='handle-existing', aliases=['he'])

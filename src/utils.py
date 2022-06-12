@@ -1,3 +1,8 @@
+import json
+from urllib import response
+
+from requests import JSONDecodeError
+
 from src.constants import REGEX_CONTENT
 
 
@@ -13,3 +18,15 @@ def seed_data_filename(from_msg_content):
     suffix = ".json"
 
     return f"raid_seed_{seed_date}{suffix}"
+
+
+def message_from_response(response):
+    try:
+        data = response.json()
+
+        data = data.get("detail", json.dumps(data, indent=4))
+
+    except JSONDecodeError:
+        data = response.text
+
+    return f"{response.status_code=}: {data}"
