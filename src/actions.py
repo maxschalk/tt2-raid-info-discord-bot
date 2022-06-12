@@ -59,7 +59,7 @@ async def handle_message(msg):
         await msg.add_reaction(emoji=EMOJI_RED_CROSS)
 
         await throw_err_on_msg(
-            msg, f"Message fits criteria (author, content format), but has {len(msg.attachments)} attachments: {msg.attachments}"
+            msg, f"Message fits criteria (author, content format), but has {len(msg.attachments)} (!= 1) attachments"
         )
 
     a, *_ = msg.attachments
@@ -76,12 +76,12 @@ async def handle_message(msg):
         parse_response=False
     )
 
-    response_data = response.json()
-
     if response.status_code != 201:
         await throw_err_on_msg(
-            msg, f"Server returned status code {response.status_code}: {response_data}"
+            msg, f"{response.status_code=}: {response_data}"
         )
+
+    response_data = response.json()
 
     if not response_data.get("created", False):
         await throw_err_on_msg(

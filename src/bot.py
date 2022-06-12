@@ -118,7 +118,7 @@ async def get_server_files(context, count: int = None):
     response_data = response.json()
 
     if response.status_code != 200:
-        await context.channel.send(f"Status code {response.status_code}: {response_data.get('detail', response_data)}")
+        await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
         return
 
     count = count or len(response_data)
@@ -142,14 +142,25 @@ async def download_server_file(context, filename: str, seed_type: SeedType = See
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
 
-    data = make_request_sync(
+    response = make_request_sync(
         method=requests.get,
         path=f"admin/seed_file/{seed_type.value}/{filename}",
         stage=STAGE,
+        parse_response=False
     )
 
-    f = io.StringIO(json.dumps(data, indent=4))
-    await context.channel.send(file=discord.File(fp=f, filename=f"{seed_type.value}_{filename}"))
+    response_data = response.json()
+
+    if response.status_code != 200:
+        await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
+
+    try:
+        f = io.StringIO(json.dumps(response_data, indent=4))
+        await context.channel.send(file=discord.File(fp=f, filename=f"{seed_type.value}_{filename}"))
+
+    except Exception as e:
+        print(f"Error when fetching a file at command !server-file: {e}")
+        await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
 
 
 @bot.command(
@@ -173,7 +184,7 @@ async def delete_server_files(context, filename: str):
 
     response_data = response.json()
 
-    await context.channel.send(f"Status code {response.status_code}: {response_data.get('detail', response_data)}")
+    await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
 
 
 @bot.command(
