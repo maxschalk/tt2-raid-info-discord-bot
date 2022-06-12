@@ -78,7 +78,7 @@ async def handle_message(msg):
 
     if response.status_code != 201:
         await throw_err_on_msg(
-            msg, f"{response.status_code=}: {response_data}"
+            msg, f"{response.status_code=}: {response.text}"
         )
 
     response_data = response.json()
