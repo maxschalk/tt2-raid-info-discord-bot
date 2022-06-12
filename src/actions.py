@@ -1,18 +1,16 @@
 import asyncio
 import json
 import re
+from contextlib import suppress
 
 import requests
 
 from src.api_interface.make_request import make_request_sync
+from src.constants import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK,
+                           EMOJI_PENGUIN, EMOJI_RED_CROSS, REGEX_CONTENT,
+                           SEED_AUTHOR)
 from src.STAGE import STAGE
-
-BOT_AUTHOR = "pingu#4195"
-SEED_AUTHOR = "GameHive #raid-seed-export#0000"
-REGEX_CONTENT = re.compile("^Raid seed export - ([0-9]{4}/[0-9]{2}/[0-9]{2})$")
-
-EMOJI_CHECK_MARK = "✅"
-EMOJI_RED_CROSS = "❌"
+from src.utils import full_username, seed_data_filename
 
 
 async def reaction_handled(reaction):
@@ -36,21 +34,11 @@ async def handle_existing_seed_messages(channel):
             if await reaction_handled(r):
                 return
 
-        # handled = any([await reaction_handled(r) for r in msg.reactions])
+        if full_username(msg.author) == BOT_USER:
+            await msg.delete()
 
-        # if handled:
-        #     return
-
-        try:
+        with suppress(RuntimeError):
             await handle_message(msg)
-        except RuntimeError as e:
-            await msg.add_reaction(emoji=EMOJI_RED_CROSS)
-            await msg.reply(e)
-
-            continue
-
-            error_msg = f"Bot startup: Erroneous existing messages, error details as replies to {EMOJI_RED_CROSS} messages"
-            raise RuntimeError(error_msg)
 
 
 async def handle_message(msg):
@@ -78,7 +66,7 @@ async def handle_message(msg):
 
     data = requests.get(a.url).json()
 
-    filename = build_filename(msg.content)
+    filename = seed_data_filename(from_msg_content=msg.content)
 
     response = make_request_sync(
         method=requests.post,
@@ -90,19 +78,17 @@ async def handle_message(msg):
 
     response_data = response.json()
 
-    if response.status_code == 200:
-
-        if response_data["file_created"]:
-            await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
-            return
-
+    if response.status_code != 201:
         await throw_err_on_msg(
-            msg, f"File could not be created on server: {response_data}"
+            msg, f"Server returned status code {response.status_code}: {response_data}"
         )
 
-    await throw_err_on_msg(
-        msg, f"Server returned status code {response.status_code}: {response_data}"
-    )
+    if not response_data.get("created", False):
+        await throw_err_on_msg(
+            msg, f"File could not be created on server: {response_data.get('detail', response_data)}"
+        )
+
+    await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
 
 
 async def throw_err_on_msg(msg, text=""):
@@ -112,24 +98,10 @@ async def throw_err_on_msg(msg, text=""):
         await msg.reply(text)
 
     raise RuntimeError(
-        f"File could not be created on server: {response_data}"
+        f"Something went wrong, please check individual {EMOJI_RED_CROSS} message replies"
     )
 
 
 async def clear_all_reactions(channel):
     async for msg in channel.history():
         await msg.clear_reactions()
-
-
-def full_username(user):
-    return f"{user.display_name}#{user.discriminator}"
-
-
-def build_filename(s):
-    matches = REGEX_CONTENT.match(s)
-
-    seed_date = matches.group(1).replace('/', '')
-
-    suffix = ".json"
-
-    return f"raid_seed_{seed_date}{suffix}"
