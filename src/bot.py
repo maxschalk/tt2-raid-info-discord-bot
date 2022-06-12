@@ -58,6 +58,8 @@ async def on_ready():
 
     guild, seeds_channel = get_guild_seeds_channel()
 
+    seeds_channel.send("Hello there")
+
     if not guild or not seeds_channel:
         print("Did not connect to guild or text channels, closing bot client.")
         await bot.close()
