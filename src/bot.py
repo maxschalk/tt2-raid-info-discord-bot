@@ -96,9 +96,7 @@ async def on_message(message):
         await handle_message(message)
 
 
-@bot.command(
-    name='server-filenames', aliases=['sfs'],
-)
+@bot.command(name='server-filenames', aliases=['sfs'])
 @commands.has_role('admin')
 async def get_server_files(context, count: int = None):
     guild, seeds_channel = get_guild_seeds_channel()
@@ -115,11 +113,11 @@ async def get_server_files(context, count: int = None):
         parse_response=False
     )
 
-    response_data = response.json()
-
     if response.status_code != 200:
-        await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
+        await context.channel.send(f"{response.status_code=}: {response.text}")
         return
+
+    response_data = response.json()
 
     count = count or len(response_data)
 
@@ -127,9 +125,7 @@ async def get_server_files(context, count: int = None):
     await context.channel.send(f"_ _\n{text}")
 
 
-@bot.command(
-    name='server-file', aliases=['sf'],
-)
+@bot.command(name='server-file', aliases=['sf'])
 @commands.has_role('admin')
 async def download_server_file(context, filename: str, seed_type: SeedType = SeedType.RAW):
     guild, seeds_channel = get_guild_seeds_channel()
@@ -149,10 +145,11 @@ async def download_server_file(context, filename: str, seed_type: SeedType = See
         parse_response=False
     )
 
-    response_data = response.json()
-
     if response.status_code != 200:
-        await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
+        await context.channel.send(f"{response.status_code=}: {response.text}")
+        return
+
+    response_data = response.json()
 
     try:
         f = io.StringIO(json.dumps(response_data, indent=4))
@@ -163,9 +160,7 @@ async def download_server_file(context, filename: str, seed_type: SeedType = See
         await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
 
 
-@bot.command(
-    name='delete-server-file', aliases=['dsf'],
-)
+@bot.command(name='delete-server-file', aliases=['dsf'])
 @commands.has_role('admin')
 async def delete_server_files(context, filename: str):
     guild, seeds_channel = get_guild_seeds_channel()
@@ -182,14 +177,16 @@ async def delete_server_files(context, filename: str):
         parse_response=False
     )
 
+    if response.status_code != 200:
+        await context.channel.send(f"{response.status_code=}: {response.text}")
+        return
+
     response_data = response.json()
 
     await context.channel.send(f"{response.status_code=}: {response_data.get('detail', response_data)}")
 
 
-@bot.command(
-    name='handle-existing', aliases=['he'],
-)
+@bot.command(name='handle-existing', aliases=['he'])
 @commands.has_role('admin')
 async def handle_existing(context):
     guild, seeds_channel = get_guild_seeds_channel()
@@ -203,9 +200,7 @@ async def handle_existing(context):
         await handle_existing_seed_messages(context.channel)
 
 
-@bot.command(
-    name='delete-messages', aliases=['del'],
-)
+@bot.command(name='delete-messages', aliases=['del'])
 @commands.has_role('admin')
 async def delete_recent_messages(context, count: int = 1):
     guild, seeds_channel = get_guild_seeds_channel()
@@ -226,9 +221,7 @@ async def delete_recent_messages(context, count: int = 1):
     print(f"Deleted {count} messages in #{context.channel.name}")
 
 
-@bot.command(
-    name='clear-reactions', aliases=['cr'],
-)
+@bot.command(name='clear-reactions', aliases=['cr'])
 @commands.has_role('admin')
 async def clear_reactions(context, count: int = 1):
     guild, seeds_channel = get_guild_seeds_channel()
