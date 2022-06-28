@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 from src.actions import (EMOJI_RED_CROSS, handle_existing_seed_messages,
                          handle_message)
-from src.api_interface.BASE_URLS import BASE_URLS
+from src.api_interface.BASE_URLS import BASE_URLS_API
 from src.api_interface.make_request import make_request_sync
 from src.api_interface.SeedType import SeedType
 from src.STAGE import STAGE
