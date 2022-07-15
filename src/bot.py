@@ -23,16 +23,14 @@ from src.utils import full_username, message_from_response
 
 load_dotenv()
 
-
 BOT_TOKEN = os.getenv('DISCORD_TOKEN')
 
 GUILD_NAME = "pingu's arctic funhouse"
 SEEDS_CHANNEL_NAME = "tt2-raid-rolls"
 
-CommandArgument = namedtuple(
-    "CommandArgument", ["name", "description", "type", "optional"],
-    defaults=["", "", "Any", False]
-)
+CommandArgument = namedtuple("CommandArgument",
+                             ["name", "description", "type", "optional"],
+                             defaults=["", "", "Any", False])
 
 COMMAND_PREFIX = '!'
 
@@ -42,23 +40,19 @@ bot = commands.Bot(command_prefix=COMMAND_PREFIX)
 @functools.cache
 def get_guild_seeds_channel():
     guild = discord.utils.get(bot.guilds, name=GUILD_NAME)
-    seeds_channel = discord.utils.get(
-        guild.text_channels, name=SEEDS_CHANNEL_NAME
-    )
+    seeds_channel = discord.utils.get(guild.text_channels,
+                                      name=SEEDS_CHANNEL_NAME)
 
     return guild, seeds_channel
 
 
 def validate_context(context, guild, target_channels) -> bool:
     if context.guild != guild:
-        raise commands.CommandError(
-            "This command does not work in this guild"
-        )
+        raise commands.CommandError("This command does not work in this guild")
 
     if context.channel not in target_channels:
         raise commands.CommandError(
-            "This command does not work in this channel"
-        )
+            "This command does not work in this channel")
 
     return True
 
@@ -74,7 +68,9 @@ async def on_ready():
         await bot.close()
         return
 
-    print(f'{bot.user.name}#{bot.user.discriminator} has connected to {GUILD_NAME}.#{seeds_channel.name}')
+    print(
+        f'{bot.user.name}#{bot.user.discriminator} has connected to {GUILD_NAME}.#{seeds_channel.name}'
+    )
 
     with suppress(RuntimeError):
         await handle_existing_seed_messages(seeds_channel)
@@ -88,7 +84,8 @@ async def on_message(message):
         return
 
     if isinstance(message.channel, discord.DMChannel):
-        await message.channel.send(content="I don't read my DMs, I'm really busy")
+        await message.channel.send(
+            content="I don't read my DMs, I'm really busy")
 
     await bot.process_commands(message)
 
@@ -110,8 +107,7 @@ async def get_server_files(context, count: int = None):
         method=requests.get,
         path=f"admin/all_seed_filenames/{SeedType.RAW.value}",
         stage=STAGE,
-        parse_response=False
-    )
+        parse_response=False)
 
     if response.status_code != 200:
         await context.channel.send(message_from_response(response))
@@ -127,7 +123,9 @@ async def get_server_files(context, count: int = None):
 
 @bot.command(name='server-file', aliases=['sf'])
 @commands.has_role('admin')
-async def download_server_file(context, filename: str, seed_type: SeedType = SeedType.RAW):
+async def download_server_file(context,
+                               filename: str,
+                               seed_type: SeedType = SeedType.RAW):
     guild, seeds_channel = get_guild_seeds_channel()
 
     if not validate_context(context, guild, (seeds_channel, )):
@@ -142,8 +140,7 @@ async def download_server_file(context, filename: str, seed_type: SeedType = See
         method=requests.get,
         path=f"admin/seed_file/{seed_type.value}/{filename}",
         stage=STAGE,
-        parse_response=False
-    )
+        parse_response=False)
 
     if response.status_code != 200:
         await context.channel.send(message_from_response(response))
@@ -153,7 +150,8 @@ async def download_server_file(context, filename: str, seed_type: SeedType = See
 
     try:
         f = io.StringIO(json.dumps(response_data, indent=4))
-        await context.channel.send(file=discord.File(fp=f, filename=f"{seed_type.value}_{filename}"))
+        await context.channel.send(
+            file=discord.File(fp=f, filename=f"{seed_type.value}_{filename}"))
 
     except Exception as e:
         print(f"Error when fetching a file at command !server-file: {e}")
@@ -170,12 +168,10 @@ async def delete_server_files(context, filename: str):
 
     await context.message.delete()
 
-    response = make_request_sync(
-        method=requests.delete,
-        path=f"admin/raw_seed_file/{filename}",
-        stage=STAGE,
-        parse_response=False
-    )
+    response = make_request_sync(method=requests.delete,
+                                 path=f"admin/raw_seed_file/{filename}",
+                                 stage=STAGE,
+                                 parse_response=False)
 
     await context.channel.send(message_from_response(response))
 

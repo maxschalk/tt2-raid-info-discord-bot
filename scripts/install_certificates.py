@@ -1,10 +1,8 @@
-
 import os
 import os.path
 import ssl
 import stat
 import certifi
-
 
 STAT_0o775 = (stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
               | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP

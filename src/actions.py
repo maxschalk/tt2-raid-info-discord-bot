@@ -7,8 +7,7 @@ import requests
 
 from src.api_interface.make_request import make_request_sync
 from src.constants import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK,
-                           EMOJI_PENGUIN, EMOJI_RED_CROSS, REGEX_CONTENT,
-                           SEED_AUTHOR)
+                           EMOJI_RED_CROSS, REGEX_CONTENT, SEED_AUTHOR)
 from src.STAGE import STAGE
 from src.utils import full_username, message_from_response, seed_data_filename
 
@@ -44,11 +43,8 @@ async def handle_existing_seed_messages(channel):
 async def handle_message(msg):
     author_name = full_username(msg.author)
 
-    relevant = (
-        (author_name in {SEED_AUTHOR, BOT_AUTHOR})
-        and
-        REGEX_CONTENT.match(msg.content)
-    )
+    relevant = ((author_name in {SEED_AUTHOR, BOT_AUTHOR})
+                and REGEX_CONTENT.match(msg.content))
 
     if not relevant:
         return
@@ -59,7 +55,8 @@ async def handle_message(msg):
         await msg.add_reaction(emoji=EMOJI_RED_CROSS)
 
         await throw_err_on_msg(
-            msg, f"Message fits criteria (author, content format), but has {len(msg.attachments)} (!= 1) attachments"
+            msg,
+            f"Message fits criteria (author, content format), but has {len(msg.attachments)} (!= 1) attachments"
         )
 
     a, *_ = msg.attachments
@@ -68,13 +65,11 @@ async def handle_message(msg):
 
     filename = seed_data_filename(from_msg_content=msg.content)
 
-    response = make_request_sync(
-        method=requests.post,
-        path=f"admin/raw_seed_file/{filename}",
-        data=json.dumps(data),
-        stage=STAGE,
-        parse_response=False
-    )
+    response = make_request_sync(method=requests.post,
+                                 path=f"admin/raw_seed_file/{filename}",
+                                 data=json.dumps(data),
+                                 stage=STAGE,
+                                 parse_response=False)
 
     if response.status_code != 201:
         await throw_err_on_msg(msg, message_from_response(response))
