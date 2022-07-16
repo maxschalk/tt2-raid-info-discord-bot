@@ -4,18 +4,13 @@ import json
 import os
 from collections import namedtuple
 from contextlib import suppress
-from random import seed
-from typing import Optional
 
-import aiohttp
 import discord
 import requests
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from src.actions import (EMOJI_RED_CROSS, handle_existing_seed_messages,
-                         handle_message)
-from src.api_interface.BASE_URLS import BASE_URLS_API
+from src.actions import handle_existing_seed_messages, handle_message
 from src.api_interface.make_request import make_request_sync
 from src.api_interface.SeedType import SeedType
 from src.STAGE import STAGE
@@ -23,18 +18,11 @@ from src.utils import full_username, message_from_response
 
 load_dotenv()
 
-BOT_TOKEN = os.getenv('DISCORD_TOKEN')
-
-GUILD_NAME = "pingu's arctic funhouse"
+GUILD_NAME = os.getenv("GUILD_NAME")
+SEEDS_CHANNEL_NAME = os.getenv("SEEDS_CHANNEL_NAME")
 SEEDS_CHANNEL_NAME = "tt2-raid-rolls"
 
-CommandArgument = namedtuple("CommandArgument",
-                             ["name", "description", "type", "optional"],
-                             defaults=["", "", "Any", False])
-
-COMMAND_PREFIX = '!'
-
-bot = commands.Bot(command_prefix=COMMAND_PREFIX)
+bot = commands.Bot(command_prefix='!')
 
 
 @functools.cache
@@ -233,7 +221,7 @@ async def clear_reactions(context, count: int = 1):
 
 
 def main():
-    bot.run(BOT_TOKEN)
+    bot.run(os.getenv('DISCORD_TOKEN'))
 
 
 if __name__ == '__main__':
