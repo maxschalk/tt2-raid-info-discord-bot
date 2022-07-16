@@ -2,7 +2,7 @@ from contextlib import suppress
 
 import discord
 from discord.ext import commands
-from src.model.SeedType import SeedType
+from src.model.seed_type import SeedType
 from src.utils import get_env
 
 from . import actions

@@ -1,5 +1,4 @@
-import subprocess
-import sys
+from .run_script import run_script
 
 
 def get_cmds(paths):
@@ -10,11 +9,7 @@ def get_cmds(paths):
 
 
 def main():
-    files = sys.argv[1:]
-
-    for cmd in get_cmds(files):
-        print(str.join(' ', cmd))
-        subprocess.run(cmd, check=True)
+    run_script(get_cmds)
 
 
 if __name__ == '__main__':

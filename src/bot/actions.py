@@ -6,8 +6,8 @@ from http.client import HTTPException
 import discord
 import requests
 from discord.ext import commands
-from src.model.SeedType import SeedType
-from src.RaidSeedDataAPI.raid_seed_data_api import RaidSeedDataAPI
+from src.model.seed_type import SeedType
+from src.raid_seed_data_api.raid_seed_data_api import RaidSeedDataAPI
 from src.utils import get_env
 
 from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,

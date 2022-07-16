@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from src.model.Stage import Stage
+from src.model.stage import Stage
 from src.utils import get_env
 
 load_dotenv()

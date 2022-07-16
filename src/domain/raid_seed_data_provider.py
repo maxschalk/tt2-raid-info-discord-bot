@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.model.SeedType import SeedType
+from src.model.seed_type import SeedType
 
 
 class RaidSeedDataProvider(ABC):
