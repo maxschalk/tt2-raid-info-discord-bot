@@ -6,7 +6,7 @@ import discord
 import requests
 from discord.ext import commands
 from src.api_interface.make_request import make_request_sync
-from src.api_interface.SeedType import SeedType
+from src.model.SeedType import SeedType
 from src.STAGE import STAGE
 
 from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,

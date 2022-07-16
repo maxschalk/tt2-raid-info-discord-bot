@@ -1,4 +1,4 @@
-from .Stage import Stage
+from src.model.Stage import Stage
 
 BASE_URLS_API = {
     Stage.DEV: "http://localhost:5000/api/v0",

@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from src.api_interface.Stage import Stage
+from src.model.Stage import Stage
 
 load_dotenv()
 
