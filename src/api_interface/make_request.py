@@ -7,9 +7,7 @@ from src.api_interface.Stage import Stage
 
 load_dotenv()
 
-ENV_AUTH_SECRET = os.getenv("API_AUTH_SECRET")
-
-HEADERS = {"secret": ENV_AUTH_SECRET}
+HEADERS = {"secret": os.getenv("API_AUTH_SECRET")}
 
 
 def make_request_sync(*,
@@ -26,13 +24,13 @@ def make_request_sync(*,
                       data=data,
                       **kwargs)
 
-    if not parse_response:
-        return response
+    if parse_response:
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            return response.text
 
-    try:
-        return response.json()
-    except requests.exceptions.JSONDecodeError:
-        return response.text
+    return response
 
 
 async def make_request_async(*,
