@@ -4,10 +4,11 @@ import requests
 from dotenv import load_dotenv
 from src.api_interface.BASE_URLS import BASE_URLS_API
 from src.api_interface.Stage import Stage
+from src.utils import get_env_strict
 
 load_dotenv()
 
-HEADERS = {"secret": os.getenv("API_AUTH_SECRET")}
+HEADERS = {"secret": get_env_strict("API_AUTH_SECRET")}
 
 
 def make_request_sync(*,

@@ -1,4 +1,5 @@
 import json
+import os
 import re
 
 import discord
@@ -51,3 +52,12 @@ def message_from_response(response: Response) -> str:
         data = response.text
 
     return f"{response.status_code=}: {data}"
+
+
+def get_env_strict(key: str) -> str:
+    value = os.getenv(key)
+
+    if value is None:
+        raise KeyError(f"{key} is not an environment variable")
+
+    return value

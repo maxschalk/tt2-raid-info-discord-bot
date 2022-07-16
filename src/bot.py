@@ -6,10 +6,10 @@ from discord.ext import commands
 
 import src.actions as actions
 from src.api_interface.SeedType import SeedType
-from src.utils import full_username
+from src.utils import full_username, get_env_strict
 
-GUILD_NAME = os.getenv("GUILD_NAME")
-SEEDS_CHANNEL_NAME = os.getenv("SEEDS_CHANNEL_NAME")
+GUILD_NAME = get_env_strict("GUILD_NAME")
+SEEDS_CHANNEL_NAME = get_env_strict("SEEDS_CHANNEL_NAME")
 
 bot = commands.Bot(command_prefix='!')
 
@@ -132,7 +132,7 @@ async def clear_reactions(context, count: int = 1):
 
 
 def main():
-    token = os.getenv('DISCORD_TOKEN')
+    token = get_env_strict('DISCORD_TOKEN')
     bot.run(token)
 
 
