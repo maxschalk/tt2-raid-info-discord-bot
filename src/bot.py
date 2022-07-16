@@ -1,8 +1,6 @@
-import functools
 import io
 import json
 import os
-from collections import namedtuple
 from contextlib import suppress
 
 import discord
@@ -20,13 +18,11 @@ load_dotenv()
 
 GUILD_NAME = os.getenv("GUILD_NAME")
 SEEDS_CHANNEL_NAME = os.getenv("SEEDS_CHANNEL_NAME")
-SEEDS_CHANNEL_NAME = "tt2-raid-rolls"
 
 bot = commands.Bot(command_prefix='!')
 
 
-@functools.cache
-def get_guild_seeds_channel():
+def _get_guild_seeds_channel():
     guild = discord.utils.get(bot.guilds, name=GUILD_NAME)
     seeds_channel = discord.utils.get(guild.text_channels,
                                       name=SEEDS_CHANNEL_NAME)
@@ -34,7 +30,7 @@ def get_guild_seeds_channel():
     return guild, seeds_channel
 
 
-def validate_context(context, guild, target_channels) -> bool:
+def _validate_context(context, guild, target_channels) -> bool:
     if context.guild != guild:
         raise commands.CommandError("This command does not work in this guild")
 
@@ -49,7 +45,7 @@ def validate_context(context, guild, target_channels) -> bool:
 async def on_ready():
     print(f'{full_username(bot.user)} has connected to Discord!')
 
-    guild, seeds_channel = get_guild_seeds_channel()
+    guild, seeds_channel = _get_guild_seeds_channel()
 
     if not guild or not seeds_channel:
         print("Did not connect to guild or text channels, closing bot client.")
@@ -57,13 +53,11 @@ async def on_ready():
         return
 
     print(
-        f'{bot.user.name}#{bot.user.discriminator} has connected to {GUILD_NAME}.#{seeds_channel.name}'
+        f'{full_username(bot.user)} has connected to {GUILD_NAME}.#{seeds_channel.name}'
     )
 
     with suppress(RuntimeError):
         await handle_existing_seed_messages(seeds_channel)
-    # except RuntimeError as e:
-    #     await seeds_channel.send(e)
 
 
 @bot.event
@@ -84,9 +78,9 @@ async def on_message(message):
 @bot.command(name='server-filenames', aliases=['sfs'])
 @commands.has_role('admin')
 async def get_server_files(context, count: int = None):
-    guild, seeds_channel = get_guild_seeds_channel()
+    guild, seeds_channel = _get_guild_seeds_channel()
 
-    if not validate_context(context, guild, (seeds_channel, )):
+    if not _validate_context(context, guild, (seeds_channel, )):
         return
 
     await context.message.delete()
@@ -114,9 +108,9 @@ async def get_server_files(context, count: int = None):
 async def download_server_file(context,
                                filename: str,
                                seed_type: SeedType = SeedType.RAW):
-    guild, seeds_channel = get_guild_seeds_channel()
+    guild, seeds_channel = _get_guild_seeds_channel()
 
-    if not validate_context(context, guild, (seeds_channel, )):
+    if not _validate_context(context, guild, (seeds_channel, )):
         return
 
     await context.message.delete()
@@ -149,9 +143,9 @@ async def download_server_file(context,
 @bot.command(name='delete-server-file', aliases=['dsf'])
 @commands.has_role('admin')
 async def delete_server_files(context, filename: str):
-    guild, seeds_channel = get_guild_seeds_channel()
+    guild, seeds_channel = _get_guild_seeds_channel()
 
-    if not validate_context(context, guild, (seeds_channel, )):
+    if not _validate_context(context, guild, (seeds_channel, )):
         return
 
     await context.message.delete()
@@ -164,12 +158,12 @@ async def delete_server_files(context, filename: str):
     await context.channel.send(message_from_response(response))
 
 
-@bot.command(name='handle-existing', aliases=['he'])
+@bot.command(name='process', aliases=['p'])
 @commands.has_role('admin')
 async def handle_existing(context):
-    guild, seeds_channel = get_guild_seeds_channel()
+    guild, seeds_channel = _get_guild_seeds_channel()
 
-    if not validate_context(context, guild, (seeds_channel, )):
+    if not _validate_context(context, guild, (seeds_channel, )):
         return
 
     await context.message.delete()
@@ -181,9 +175,9 @@ async def handle_existing(context):
 @bot.command(name='delete-messages', aliases=['del'])
 @commands.has_role('admin')
 async def delete_recent_messages(context, count: int = 1):
-    guild, seeds_channel = get_guild_seeds_channel()
+    guild, seeds_channel = _get_guild_seeds_channel()
 
-    if not validate_context(context, guild, (seeds_channel, )):
+    if not _validate_context(context, guild, (seeds_channel, )):
         return
 
     if count <= 0:
@@ -202,9 +196,9 @@ async def delete_recent_messages(context, count: int = 1):
 @bot.command(name='clear-reactions', aliases=['cr'])
 @commands.has_role('admin')
 async def clear_reactions(context, count: int = 1):
-    guild, seeds_channel = get_guild_seeds_channel()
+    guild, seeds_channel = _get_guild_seeds_channel()
 
-    if not validate_context(context, guild, (seeds_channel, )):
+    if not _validate_context(context, guild, (seeds_channel, )):
         return
 
     if count <= 0:

@@ -18,7 +18,7 @@ EMOJI_RED_CROSS = "❌"
 EMOJI_PENGUIN = "🐧"
 
 
-async def reaction_handled(reaction):
+async def _is_handled(reaction):
     if reaction.emoji not in {EMOJI_CHECK_MARK, EMOJI_RED_CROSS}:
         return False
 
@@ -36,7 +36,7 @@ async def handle_existing_seed_messages(channel):
     async for msg in channel.history():
 
         for r in msg.reactions:
-            if await reaction_handled(r):
+            if await _is_handled(r):
                 return
 
         if full_username(msg.author) == BOT_USER:
