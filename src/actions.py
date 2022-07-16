@@ -1,4 +1,3 @@
-import asyncio
 import json
 import re
 from contextlib import suppress
@@ -6,10 +5,17 @@ from contextlib import suppress
 import requests
 
 from src.api_interface.make_request import make_request_sync
-from src.constants import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK,
-                           EMOJI_RED_CROSS, REGEX_CONTENT, SEED_AUTHOR)
 from src.STAGE import STAGE
 from src.utils import full_username, message_from_response, seed_data_filename
+
+BOT_AUTHOR = "pingu#4195"
+BOT_USER = "TT2RaidSeedBot#1932"
+SEED_AUTHOR = "GameHive #raid-seed-export#0000"
+REGEX_CONTENT = re.compile("^Raid seed export - ([0-9]{4}/[0-9]{2}/[0-9]{2})$")
+
+EMOJI_CHECK_MARK = "✅"
+EMOJI_RED_CROSS = "❌"
+EMOJI_PENGUIN = "🐧"
 
 
 async def reaction_handled(reaction):
