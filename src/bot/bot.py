@@ -92,7 +92,7 @@ async def process_existing(context):
 async def get_server_files(context, count: int = None):
     await _process_context(context)
 
-    await actions.get_server_filenames(context=context, count=count)
+    await actions.get_seed_identifiers(context=context, count=count)
 
 
 @bot.command(name='server-file', aliases=['sf'])

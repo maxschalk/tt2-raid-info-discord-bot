@@ -1,17 +1,23 @@
 import io
 import json
 from contextlib import suppress
+from http.client import HTTPException
 
 import discord
 import requests
 from discord.ext import commands
-from src.api_interface.make_request import make_request_sync
 from src.model.SeedType import SeedType
+from src.RaidSeedDataAPI.RaidSeedDataAPI import RaidSeedDataAPI
 from src.STAGE import STAGE
+from src.utils import get_env_strict
 
 from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
                     full_username, is_relevant_message, message_from_response,
                     seed_data_filename)
+
+provider = RaidSeedDataAPI(
+    base_url=get_env_strict("RAID_SEED_DATA_API_BASE_URL"),
+    auth_key=get_env_strict("RAID_SEED_DATA_API_AUTH_SECRET"))
 
 
 async def _is_handled(reaction):
@@ -79,42 +85,26 @@ async def process_message(msg):
 
     filename = seed_data_filename(from_msg_content=msg.content)
 
-    response = make_request_sync(method=requests.post,
-                                 path=f"admin/raw_seed_file/{filename}",
-                                 data=json.dumps(data),
-                                 stage=STAGE,
-                                 parse_response=False)
-
-    if response.status_code != 201:
-        await _throw_err_on_msg(msg, message_from_response(response))
-
-    response_data = response.json()
-
-    if not response_data.get("created", False):
-        await _throw_err_on_msg(msg, message_from_response(response))
+    try:
+        data = provider.save_seed(identifier=filename, data=json.dumps(data))
+    except HTTPException as e:
+        await _throw_err_on_msg(msg, f"Error saving seed: {e}")
 
     await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
 
 
-async def get_server_filenames(context, count: int = None) -> list[str] | str:
+async def get_seed_identifiers(context, count: int = None) -> list[str] | str:
 
-    response = make_request_sync(
-        method=requests.get,
-        path=f"admin/all_seed_filenames/{SeedType.RAW.value}",
-        stage=STAGE,
-        parse_response=False)
+    try:
+        data = provider.list_seed_identifiers()
+    except HTTPException as e:
+        await context.channel.send(f"Error getting seed identifiers: {e}")
 
-    if response.status_code != 200:
-        await context.channel.send(message_from_response(response))
-        return
+    count = count or len(data)
 
-    response_data = response.json()
+    get_seed_identifiers = data[-count:]
 
-    count = count or len(response_data)
-
-    filenames = response_data[-count:]
-
-    text = str.join('\n', filenames)
+    text = str.join('\n', get_seed_identifiers)
 
     await context.channel.send(f"_ _\n{text}")
 
@@ -125,30 +115,25 @@ async def download_server_file(context, filename: str,
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
 
-    response = make_request_sync(
-        method=requests.get,
-        path=f"admin/seed_file/{seed_type.value}/{filename}",
-        stage=STAGE,
-        parse_response=False)
+    try:
+        data = provider.get_seed(identifier=filename, seed_type=seed_type)
+    except HTTPException as e:
+        await context.channel.send(f"Error getting seed: {e}")
 
-    if response.status_code != 200:
-        await context.channel.send(message_from_response(response))
-
-    response_data = response.json()
-
-    f = io.StringIO(json.dumps(response_data, indent=4))
+    f = io.StringIO(json.dumps(data, indent=4))
     await context.channel.send(
         file=discord.File(fp=f, filename=f"{seed_type.value}_{filename}"))
 
 
 async def delete_server_file(context, filename: str):
 
-    response = make_request_sync(method=requests.delete,
-                                 path=f"admin/raw_seed_file/{filename}",
-                                 stage=STAGE,
-                                 parse_response=False)
+    try:
+        provider.delete_seed(identifier=filename)
+    except HTTPException as e:
+        await context.channel.send(f"Error deleting seed: {e}")
+        return
 
-    await context.channel.send(message_from_response(response))
+    await context.channel.send(f"Deleted seed {filename}")
 
 
 async def delete_recent_messages(context, count: int = 1):

@@ -1,6 +1,5 @@
 import requests
 from dotenv import load_dotenv
-from src.api_interface.BASE_URLS import BASE_URLS_API
 from src.model.Stage import Stage
 from src.utils import get_env_strict
 
