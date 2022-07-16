@@ -1,19 +1,24 @@
 #!/bin/sh
 
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
-echo running format on staged files = $STAGED_FILES
+echo STAGED_FILES: $STAGED_FILES
 
-./venv/Scripts/activate.bat
+for file in $STAGED_FILES
+do
+    [[ $file =~ ^.+\.py$ ]] || continue
 
-python -m scripts.format $STAGED_FILES
+    echo yapf -i $file
+    yapf -i $file
+    git add $file
 
-echo staging files = $STAGED_FILES
-git add -f $STAGED_FILES
+    echo pylint $file
+    pylint $file
+    LINTER_EXIT_CODE=$?
 
-# for file in $STAGED_FILES
-# do
-#   yapf -i $file
-#   git add $file
-# done;
+    if [ $LINTER_EXIT_CODE -ne 0 ]; then
+        echo "Linter error, commit aborted"
+        exit 1
+    fi
+done;
 
 exit 0
