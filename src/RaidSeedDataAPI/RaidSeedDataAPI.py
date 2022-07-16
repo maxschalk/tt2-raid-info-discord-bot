@@ -1,4 +1,3 @@
-import json
 from typing import Any, Callable
 
 import requests
