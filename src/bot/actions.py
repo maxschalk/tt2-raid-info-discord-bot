@@ -5,13 +5,13 @@ from contextlib import suppress
 import discord
 import requests
 from discord.ext import commands
-
 from src.api_interface.make_request import make_request_sync
 from src.api_interface.SeedType import SeedType
 from src.STAGE import STAGE
-from src.utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
-                       full_username, is_relevant_message,
-                       message_from_response, seed_data_filename)
+
+from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
+                    full_username, is_relevant_message, message_from_response,
+                    seed_data_filename)
 
 
 async def _is_handled(reaction):

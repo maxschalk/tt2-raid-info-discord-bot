@@ -3,10 +3,10 @@ from contextlib import suppress
 
 import discord
 from discord.ext import commands
-
-import src.actions as actions
 from src.api_interface.SeedType import SeedType
 from src.utils import full_username, get_env_strict
+
+from . import actions
 
 GUILD_NAME = get_env_strict("GUILD_NAME")
 SEEDS_CHANNEL_NAME = get_env_strict("SEEDS_CHANNEL_NAME")
