@@ -3,13 +3,10 @@ from contextlib import suppress
 
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
 
 import src.actions as actions
 from src.api_interface.SeedType import SeedType
 from src.utils import full_username
-
-load_dotenv()
 
 GUILD_NAME = os.getenv("GUILD_NAME")
 SEEDS_CHANNEL_NAME = os.getenv("SEEDS_CHANNEL_NAME")
