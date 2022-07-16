@@ -3,7 +3,7 @@ from urllib import response
 
 from requests import JSONDecodeError
 
-from src.constants import REGEX_CONTENT
+from src.actions import REGEX_CONTENT
 
 
 def full_username(user):
