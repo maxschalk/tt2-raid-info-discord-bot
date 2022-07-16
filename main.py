@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from src import bot
+from src.bot import bot
 
 load_dotenv()
 
