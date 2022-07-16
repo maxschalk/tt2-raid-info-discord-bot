@@ -7,9 +7,9 @@ from PATHS import SCRIPTS_DIR, SRC_DIR
 
 def get_cmds(paths):
     if not paths:
-        return (("yapf", "-ir", ".", "--exclude", "venv"), )
+        return (("yapf", ".", "-ir", "-e", "venv"), )
 
-    return (("yapf", "-i", path) for path in paths)
+    return (("yapf", path, "-i") for path in paths)
 
 
 def main():
