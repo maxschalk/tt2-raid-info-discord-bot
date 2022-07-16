@@ -19,6 +19,10 @@ bot = commands.Bot(command_prefix='!')
 
 def _get_guild_channel():
     guild = discord.utils.get(bot.guilds, name=GUILD_NAME)
+
+    if not guild:
+        return None, None
+
     seeds_channel = discord.utils.get(guild.text_channels,
                                       name=SEEDS_CHANNEL_NAME)
 
