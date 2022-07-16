@@ -8,12 +8,10 @@ import requests
 from discord.ext import commands
 from src.model.SeedType import SeedType
 from src.RaidSeedDataAPI.RaidSeedDataAPI import RaidSeedDataAPI
-from src.STAGE import STAGE
 from src.utils import get_env_strict
 
 from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
-                    full_username, is_relevant_message, message_from_response,
-                    seed_identifier)
+                    full_username, is_relevant_message, seed_identifier)
 
 provider = RaidSeedDataAPI(
     base_url=get_env_strict("RAID_SEED_DATA_API_BASE_URL"),
@@ -53,8 +51,8 @@ async def _clear_all_reactions(channel):
 async def process_existing_messages(channel):
     async for msg in channel.history():
 
-        for r in msg.reactions:
-            if await _is_handled(r):
+        for reaction in msg.reactions:
+            if await _is_handled(reaction):
                 return
 
         if full_username(msg.author) == BOT_USER:
@@ -75,20 +73,19 @@ async def process_message(msg):
         await msg.add_reaction(emoji=EMOJI_RED_CROSS)
 
         await _throw_err_on_msg(
-            msg,
-            f"Message fits criteria (author, content format), but has {len(msg.attachments)} (!= 1) attachments"
-        )
+            msg, f"Message fits criteria (author, content format), \
+            but has {len(msg.attachments)} (!= 1) attachments")
 
-    a, *_ = msg.attachments
+    attachment, *_ = msg.attachments
 
-    data = requests.get(a.url).json()
+    data = requests.get(attachment.url).json()
 
     identifier = seed_identifier(from_msg_content=msg.content)
 
     try:
-        data = provider.save_seed(identifier=identifier, data=json.dumps(data))
-    except HTTPException as e:
-        await _throw_err_on_msg(msg, f"Error saving seed: {e}")
+        provider.save_seed(identifier=identifier, data=json.dumps(data))
+    except HTTPException as error:
+        await _throw_err_on_msg(msg, f"Error saving seed: {error}")
 
     await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
 
@@ -97,14 +94,14 @@ async def get_seed_identifiers(context, count: int = None) -> list[str] | str:
 
     try:
         data = provider.list_seed_identifiers()
-    except HTTPException as e:
-        await context.channel.send(f"Error getting seed identifiers: {e}")
+    except HTTPException as error:
+        await context.channel.send(f"Error getting seed identifiers: {error}")
 
     count = count or len(data)
 
-    get_seed_identifiers = data[-count:]
+    seed_ids = data[-count:]
 
-    text = str.join('\n', get_seed_identifiers)
+    text = str.join('\n', seed_ids)
 
     await context.channel.send(f"_ _\n{text}")
 
@@ -114,20 +111,20 @@ async def get_seed_data(context, identifier: str,
 
     try:
         data = provider.get_seed(identifier=identifier, seed_type=seed_type)
-    except HTTPException as e:
-        await context.channel.send(f"Error getting seed: {e}")
+    except HTTPException as error:
+        await context.channel.send(f"Error getting seed: {error}")
 
-    f = io.StringIO(json.dumps(data, indent=4))
-    await context.channel.send(
-        file=discord.File(fp=f, filename=f"{seed_type.value}_{identifier}"))
+    file_obj = io.StringIO(json.dumps(data, indent=4))
+    await context.channel.send(file=discord.File(
+        fp=file_obj, filename=f"{seed_type.value}_{identifier}"))
 
 
 async def delete_seed(context, identifier: str):
 
     try:
         provider.delete_seed(identifier=identifier)
-    except HTTPException as e:
-        await context.channel.send(f"Error deleting seed: {e}")
+    except HTTPException as error:
+        await context.channel.send(f"Error deleting seed: {error}")
         return
 
     await context.channel.send(f"Deleted seed {identifier}")
