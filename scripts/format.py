@@ -1,8 +1,5 @@
 import subprocess
 import sys
-from pathlib import Path
-
-from PATHS import SCRIPTS_DIR, SRC_DIR
 
 
 def get_cmds(paths):
@@ -17,7 +14,7 @@ def main():
 
     for cmd in get_cmds(files):
         print(str.join(' ', cmd))
-        subprocess.run(cmd)
+        subprocess.run(cmd, check=True)
 
 
 if __name__ == '__main__':

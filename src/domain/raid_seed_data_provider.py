@@ -11,8 +11,7 @@ class RaidSeedDataProvider(ABC):
     @abstractmethod
     def list_seed_identifiers(self: RaidSeedDataProvider,
                               *,
-                              seed_type: SeedType = SeedType.RAW,
-                              count: int = None) -> list[str]:
+                              seed_type: SeedType = SeedType.RAW) -> list[str]:
         pass
 
     @abstractmethod

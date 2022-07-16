@@ -6,14 +6,14 @@ DEFAULT_DIR = "./.git-hooks"
 
 def main():
     try:
-        dir = sys.argv[1]
+        hooks_dir = sys.argv[1]
     except IndexError:
-        dir = DEFAULT_DIR
+        hooks_dir = DEFAULT_DIR
 
-    cmd = ("git", "config", "core.hooksPath", dir)
+    cmd = ("git", "config", "core.hooksPath", hooks_dir)
 
     print(str.join(' ', cmd))
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
 
 
 if __name__ == '__main__':

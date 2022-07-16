@@ -2,7 +2,7 @@ from typing import Any, Callable
 
 import requests
 from requests import Response
-from src.domain.RaidSeedDataProvider import RaidSeedDataProvider
+from src.domain.raid_seed_data_provider import RaidSeedDataProvider
 from src.model.SeedType import SeedType
 
 

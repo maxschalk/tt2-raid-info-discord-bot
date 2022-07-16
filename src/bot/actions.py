@@ -7,7 +7,7 @@ import discord
 import requests
 from discord.ext import commands
 from src.model.SeedType import SeedType
-from src.RaidSeedDataAPI.RaidSeedDataAPI import RaidSeedDataAPI
+from src.RaidSeedDataAPI.raid_seed_data_api import RaidSeedDataAPI
 from src.utils import get_env_strict
 
 from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
