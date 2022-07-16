@@ -1,10 +1,14 @@
 import os
 
+from dotenv import load_dotenv
 
-def get_env_strict(key: str) -> str:
+load_dotenv()
+
+
+def get_env(key: str, strict: bool = True) -> str:
     value = os.getenv(key)
 
-    if value is None:
+    if strict and value is None:
         raise KeyError(f"{key} is not an environment variable")
 
     return value

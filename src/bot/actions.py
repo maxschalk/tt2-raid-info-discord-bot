@@ -8,14 +8,13 @@ import requests
 from discord.ext import commands
 from src.model.SeedType import SeedType
 from src.RaidSeedDataAPI.raid_seed_data_api import RaidSeedDataAPI
-from src.utils import get_env_strict
+from src.utils import get_env
 
 from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
                     full_username, is_relevant_message, seed_identifier)
 
-provider = RaidSeedDataAPI(
-    base_url=get_env_strict("RAID_SEED_DATA_API_BASE_URL"),
-    auth_key=get_env_strict("RAID_SEED_DATA_API_AUTH_SECRET"))
+provider = RaidSeedDataAPI(base_url=get_env("RAID_SEED_DATA_API_BASE_URL"),
+                           auth_key=get_env("RAID_SEED_DATA_API_AUTH_SECRET"))
 
 
 async def _is_handled(reaction):

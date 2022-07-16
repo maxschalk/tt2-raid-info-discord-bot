@@ -3,13 +3,13 @@ from contextlib import suppress
 import discord
 from discord.ext import commands
 from src.model.SeedType import SeedType
-from src.utils import get_env_strict
+from src.utils import get_env
 
 from . import actions
 from .utils import full_username
 
-GUILD_NAME = get_env_strict("GUILD_NAME")
-SEEDS_CHANNEL_NAME = get_env_strict("SEEDS_CHANNEL_NAME")
+GUILD_NAME = get_env("GUILD_NAME")
+SEEDS_CHANNEL_NAME = get_env("SEEDS_CHANNEL_NAME")
 
 bot = commands.Bot(command_prefix='!')
 
@@ -132,7 +132,7 @@ async def clear_reactions(context, count: int = 1):
 
 
 def main():
-    token = get_env_strict('DISCORD_TOKEN')
+    token = get_env('DISCORD_TOKEN')
     bot.run(token)
 
 
