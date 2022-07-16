@@ -33,7 +33,7 @@ def is_raid_seed_message(message: discord.Message) -> bool:
     return REGEX_CONTENT.match(message.content)
 
 
-def seed_data_filename(from_msg_content: str) -> str:
+def seed_identifier(from_msg_content: str) -> str:
     matches = REGEX_CONTENT.match(from_msg_content)
 
     seed_date = matches.group(1).replace('/', '')

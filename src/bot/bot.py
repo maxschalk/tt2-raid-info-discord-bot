@@ -87,32 +87,32 @@ async def process_existing(context):
     await actions.process_existing_messages(context.channel)
 
 
-@bot.command(name='server-filenames', aliases=['sfs'])
+@bot.command(name='seed-identifiers', aliases=['sids'])
 @commands.has_role('admin')
-async def get_server_files(context, count: int = None):
+async def get_seed_identifiers(context, count: int = None):
     await _process_context(context)
 
     await actions.get_seed_identifiers(context=context, count=count)
 
 
-@bot.command(name='server-file', aliases=['sf'])
+@bot.command(name='seed', aliases=['s'])
 @commands.has_role('admin')
-async def download_server_file(context,
-                               filename: str,
-                               seed_type: SeedType = SeedType.RAW):
+async def get_seed_data(context,
+                        identifier: str,
+                        seed_type: SeedType = SeedType.RAW):
     await _process_context(context)
 
-    await actions.download_server_file(context=context,
-                                       filename=filename,
-                                       seed_type=seed_type)
+    await actions.get_seed_data(context=context,
+                                identifier=identifier,
+                                seed_type=seed_type)
 
 
-@bot.command(name='delete-server-file', aliases=['dsf'])
+@bot.command(name='delete-seed', aliases=['ds'])
 @commands.has_role('admin')
-async def delete_server_file(context, filename: str):
+async def delete_seed(context, identifier: str):
     await _process_context(context)
 
-    await actions.delete_server_file(context=context, filename=filename)
+    await actions.delete_seed(context=context, identifier=identifier)
 
 
 @bot.command(name='delete-messages', aliases=['del'])

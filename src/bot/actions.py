@@ -13,7 +13,7 @@ from src.utils import get_env_strict
 
 from .utils import (BOT_AUTHOR, BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
                     full_username, is_relevant_message, message_from_response,
-                    seed_data_filename)
+                    seed_identifier)
 
 provider = RaidSeedDataAPI(
     base_url=get_env_strict("RAID_SEED_DATA_API_BASE_URL"),
@@ -83,10 +83,10 @@ async def process_message(msg):
 
     data = requests.get(a.url).json()
 
-    filename = seed_data_filename(from_msg_content=msg.content)
+    identifier = seed_identifier(from_msg_content=msg.content)
 
     try:
-        data = provider.save_seed(identifier=filename, data=json.dumps(data))
+        data = provider.save_seed(identifier=identifier, data=json.dumps(data))
     except HTTPException as e:
         await _throw_err_on_msg(msg, f"Error saving seed: {e}")
 
@@ -109,31 +109,28 @@ async def get_seed_identifiers(context, count: int = None) -> list[str] | str:
     await context.channel.send(f"_ _\n{text}")
 
 
-async def download_server_file(context, filename: str,
-                               seed_type: SeedType) -> tuple[str, str]:
-
-    if not filename.endswith(".json"):
-        filename = f"{filename}.json"
+async def get_seed_data(context, identifier: str,
+                        seed_type: SeedType) -> tuple[str, str]:
 
     try:
-        data = provider.get_seed(identifier=filename, seed_type=seed_type)
+        data = provider.get_seed(identifier=identifier, seed_type=seed_type)
     except HTTPException as e:
         await context.channel.send(f"Error getting seed: {e}")
 
     f = io.StringIO(json.dumps(data, indent=4))
     await context.channel.send(
-        file=discord.File(fp=f, filename=f"{seed_type.value}_{filename}"))
+        file=discord.File(fp=f, filename=f"{seed_type.value}_{identifier}"))
 
 
-async def delete_server_file(context, filename: str):
+async def delete_seed(context, identifier: str):
 
     try:
-        provider.delete_seed(identifier=filename)
+        provider.delete_seed(identifier=identifier)
     except HTTPException as e:
         await context.channel.send(f"Error deleting seed: {e}")
         return
 
-    await context.channel.send(f"Deleted seed {filename}")
+    await context.channel.send(f"Deleted seed {identifier}")
 
 
 async def delete_recent_messages(context, count: int = 1):
