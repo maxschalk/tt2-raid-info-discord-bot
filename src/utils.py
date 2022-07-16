@@ -1,26 +1,24 @@
 import json
-from urllib import response
 
-from requests import JSONDecodeError
+import discord
+from requests import JSONDecodeError, Response
 
 from src.actions import REGEX_CONTENT
 
 
-def full_username(user):
+def full_username(user: discord.User) -> str:
     return f"{user.display_name}#{user.discriminator}"
 
 
-def seed_data_filename(from_msg_content):
+def seed_data_filename(from_msg_content: str) -> str:
     matches = REGEX_CONTENT.match(from_msg_content)
 
     seed_date = matches.group(1).replace('/', '')
 
-    suffix = ".json"
-
-    return f"raid_seed_{seed_date}{suffix}"
+    return f"raid_seed_{seed_date}.json"
 
 
-def message_from_response(response):
+def message_from_response(response: Response) -> str:
     try:
         data = response.json()
 
