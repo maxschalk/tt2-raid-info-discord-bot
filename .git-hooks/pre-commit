@@ -3,22 +3,27 @@
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
 echo STAGED_FILES: $STAGED_FILES
 
-for file in $STAGED_FILES
-do
-    [[ $file =~ ^.+\.py$ ]] || continue
+# for file in $STAGED_FILES
+# do
+#     [[ $file =~ ^.+\.py$ ]] || continue
 
-    echo yapf -i $file
-    yapf -i $file
-    git add $file
+#     echo yapf -i $file
+#     yapf -i $file
+#     git add $file
 
-    echo pylint $file
-    pylint $file
-    LINTER_EXIT_CODE=$?
+# done;
 
-    if [ $LINTER_EXIT_CODE -ne 0 ]; then
-        echo "Linter error, commit aborted"
-        exit 1
-    fi
-done;
+echo python -m scripts.format
+python -m scripts.format
+git add -f $STAGED_FILES
+
+echo python -m scripts.lint
+python -m scripts.lint
+LINTER_EXIT_CODE=$?
+
+if [ $LINTER_EXIT_CODE -ne 0 ]; then
+    echo "Linter error, commit aborted"
+    exit 1
+fi
 
 exit 0
