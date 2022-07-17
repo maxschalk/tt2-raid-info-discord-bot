@@ -2,6 +2,7 @@ import re
 
 import discord
 
+# Move to .env
 BOT_AUTHOR = "pingu#4195"
 BOT_USER = "TT2RaidSeedBot#1932"
 SEED_AUTHOR = "GameHive #raid-seed-export#0000"
@@ -37,3 +38,30 @@ def seed_identifier(from_msg_content: str) -> str:
     seed_date = matches.group(1).replace('/', '')
 
     return f"raid_seed_{seed_date}.json"
+
+
+async def is_handled(msg: discord.Message):
+    for reaction in msg.reactions:
+        if reaction.emoji not in {EMOJI_CHECK_MARK, EMOJI_RED_CROSS}:
+            return False
+
+        if reaction.me:
+            return True
+
+        if any(
+                full_username(user) == BOT_AUTHOR
+                async for user in reaction.users()):
+            return True
+
+        return False
+
+
+async def throw_err_on_msg(msg, text=None):
+    await msg.add_reaction(emoji=EMOJI_RED_CROSS)
+
+    if text:
+        await msg.reply(text)
+
+    raise RuntimeError(
+        f"Something went wrong, please check individual {EMOJI_RED_CROSS} message replies"
+    )
