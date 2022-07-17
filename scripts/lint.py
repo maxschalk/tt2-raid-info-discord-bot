@@ -10,7 +10,7 @@ def get_cmds(paths):
 
 
 def main():
-    run_script(get_cmds)
+    run_script(get_cmds, check=False)
 
 
 if __name__ == '__main__':
