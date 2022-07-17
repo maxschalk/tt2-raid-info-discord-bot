@@ -8,10 +8,10 @@ from src.bot.utils import (BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
 from src.domain.raid_seed_data_provider import RaidSeedDataProvider
 
 
-def factory_process_message(data_provider: RaidSeedDataProvider):
+def factory_process_message(*, data_provider: RaidSeedDataProvider):
 
-    async def process_message(msg):
-        if not is_relevant_message(msg):
+    async def process_message(*, msg):
+        if not is_relevant_message(msg=msg):
             return
 
         print("relevant message found:", msg.content)
@@ -20,12 +20,17 @@ def factory_process_message(data_provider: RaidSeedDataProvider):
             await msg.add_reaction(emoji=EMOJI_RED_CROSS)
 
             await throw_err_on_msg(
-                msg, f"Message fits criteria (author, content format), \
+                msg=msg,
+                text=f"Message fits criteria (author, content format), \
                 but has {len(msg.attachments)} (!= 1) attachments")
 
         attachment = msg.attachments[0]
 
-        data = requests.get(attachment.url).json()
+        try:
+            data = requests.get(attachment.url).json()
+        except json.JSONDecodeError as error:
+            await throw_err_on_msg(msg=msg, text=f"Invalid JSON: {error}")
+            return
 
         identifier = seed_identifier(from_msg_content=msg.content)
 
@@ -33,27 +38,28 @@ def factory_process_message(data_provider: RaidSeedDataProvider):
             data_provider.save_seed(identifier=identifier,
                                     data=json.dumps(data))
         except Exception as error:
-            await throw_err_on_msg(msg, f"Error saving seed: {error}")
+            await throw_err_on_msg(msg=msg, text=f"Error saving seed: {error}")
+            return
 
         await msg.add_reaction(emoji=EMOJI_CHECK_MARK)
 
     return process_message
 
 
-def factory_process_existing_messages(data_provider: RaidSeedDataProvider):
+def factory_process_existing_messages(*, data_provider: RaidSeedDataProvider):
 
-    process_message = factory_process_message(data_provider)
+    process_message = factory_process_message(data_provider=data_provider)
 
-    async def process_existing_messages(channel):
+    async def process_existing_messages(*, channel):
         async for msg in channel.history():
 
-            if await is_handled(msg):
+            if await is_handled(msg=msg):
                 return
 
-            if full_username(msg.author) == BOT_USER:
+            if full_username(user=msg.author) == BOT_USER:
                 await msg.delete()
 
             with suppress(RuntimeError):
-                await process_message(msg)
+                await process_message(msg=msg)
 
     return process_existing_messages

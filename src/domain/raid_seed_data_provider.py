@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
+# pylint: disable=import-error
 from src.model.seed_type import SeedType
 
 

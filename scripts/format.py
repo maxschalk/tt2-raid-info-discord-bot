@@ -1,7 +1,7 @@
 from .run_script import run_script
 
 
-def get_cmds(paths):
+def get_cmds(*, paths):
     if not paths:
         return (("yapf", ".", "-ir", "-e", "venv"), )
 
@@ -9,7 +9,7 @@ def get_cmds(paths):
 
 
 def main():
-    run_script(get_cmds)
+    run_script(get_cmds=get_cmds)
 
 
 if __name__ == '__main__':

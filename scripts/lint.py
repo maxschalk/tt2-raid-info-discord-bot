@@ -1,7 +1,7 @@
 from .run_script import run_script
 
 
-def get_cmds(paths):
+def get_cmds(*, paths):
     if not paths:
         return (("pylint", ".", "--recursive", "y", "--ignore-patterns",
                  "venv"), )
@@ -10,7 +10,7 @@ def get_cmds(paths):
 
 
 def main():
-    run_script(get_cmds, check=False)
+    run_script(get_cmds=get_cmds, check=False)
 
 
 if __name__ == '__main__':

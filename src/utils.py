@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_env(key: str, strict: bool = True) -> str:
+def get_env(*, key: str, strict: bool = True) -> str:
     value = os.getenv(key)
 
     if strict and value is None:

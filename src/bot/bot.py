@@ -8,27 +8,33 @@ from src.bot.bot_event_listeners import add_event_listeners
 from src.domain.raid_seed_data_provider import RaidSeedDataProvider
 
 
-def setup_bot(bot: commands.Bot, guild_name: str, channel_name: str,
+def setup_bot(*, bot: commands.Bot, guild_name: str, channel_name: str,
               data_provider: RaidSeedDataProvider) -> None:
 
-    get_guild = factory_get_guild(bot, guild_name)
-    get_channel = factory_get_channel(channel_name)
-    process_context = factory_process_context(get_guild, get_channel)
+    get_guild = factory_get_guild(bot=bot, guild_name=guild_name)
+    get_channel = factory_get_channel(channel_name=channel_name)
+    process_context = factory_process_context(get_guild=get_guild,
+                                              get_channel=get_channel)
 
-    add_event_listeners(bot, get_guild, get_channel, data_provider)
+    add_event_listeners(bot=bot,
+                        get_guild=get_guild,
+                        get_channel=get_channel,
+                        data_provider=data_provider)
 
-    add_meta_commands(bot, process_context)
+    add_meta_commands(bot=bot, process_context=process_context)
 
-    add_domain_commands(bot, process_context, data_provider)
+    add_domain_commands(bot=bot,
+                        process_context=process_context,
+                        data_provider=data_provider)
 
 
-def factory_get_guild(bot, guild_name) -> Callable:
+def factory_get_guild(*, bot, guild_name) -> Callable:
     return lambda: discord.utils.get(bot.guilds, name=guild_name)
 
 
-def factory_get_channel(channel_name: str) -> Callable:
+def factory_get_channel(*, channel_name: str) -> Callable:
 
-    def func(guild):
+    def func(*, guild):
         if not guild:
             return None
 
@@ -37,13 +43,15 @@ def factory_get_channel(channel_name: str) -> Callable:
     return func
 
 
-def factory_process_context(get_guild, get_channel):
+def factory_process_context(*, get_guild, get_channel):
 
-    async def process_context(context):
+    async def process_context(*, context):
         guild = get_guild()
-        seeds_channel = get_channel(guild)
+        seeds_channel = get_channel(guild=guild)
 
-        if not _validate_context(context, guild, (seeds_channel, )):
+        if not _validate_context(context=context,
+                                 guild=guild,
+                                 target_channels=(seeds_channel, )):
             return
 
         await context.message.delete()
@@ -51,7 +59,7 @@ def factory_process_context(get_guild, get_channel):
     return process_context
 
 
-def _validate_context(context, guild, target_channels) -> bool:
+def _validate_context(*, context, guild, target_channels) -> bool:
     if context.guild != guild:
         raise commands.CommandError("This command does not work in this guild")
 

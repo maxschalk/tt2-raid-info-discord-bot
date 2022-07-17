@@ -69,5 +69,12 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
         identifier: str,
     ) -> None:
 
-        self._make_api_request(method=requests.delete,
-                               path=f"admin/raw_seed_file/{identifier}")
+        response = self._make_api_request(
+            method=requests.delete, path=f"admin/raw_seed_file/{identifier}")
+
+        data = response.json()
+
+        if not data.get("deleted", False):
+            raise ValueError(
+                f"Seed {identifier} was not deleted: {data.get('detail', data)}"
+            )

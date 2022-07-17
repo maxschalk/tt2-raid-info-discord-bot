@@ -4,20 +4,23 @@ from src.bot.bot import setup_bot
 from src.raid_seed_data_api.raid_seed_data_api import RaidSeedDataAPI
 from src.utils import get_env
 
-GUILD_NAME = get_env("GUILD_NAME")
-SEEDS_CHANNEL_NAME = get_env("SEEDS_CHANNEL_NAME")
+GUILD_NAME = get_env(key="GUILD_NAME")
+SEEDS_CHANNEL_NAME = get_env(key="SEEDS_CHANNEL_NAME")
 
-BOT_TOKEN = get_env('DISCORD_TOKEN')
+BOT_TOKEN = get_env(key='DISCORD_TOKEN')
 
 DATA_PROVIDER = RaidSeedDataAPI(
-    base_url=get_env("RAID_SEED_DATA_API_BASE_URL"),
-    auth_key=get_env("RAID_SEED_DATA_API_AUTH_SECRET"))
+    base_url=get_env(key="RAID_SEED_DATA_API_BASE_URL"),
+    auth_key=get_env(key="RAID_SEED_DATA_API_AUTH_SECRET"))
 
 
 def main():
     bot = commands.Bot(command_prefix='!')
 
-    setup_bot(bot, GUILD_NAME, SEEDS_CHANNEL_NAME, DATA_PROVIDER)
+    setup_bot(bot=bot,
+              guild_name=GUILD_NAME,
+              channel_name=SEEDS_CHANNEL_NAME,
+              data_provider=DATA_PROVIDER)
 
     bot.run(BOT_TOKEN)
 
