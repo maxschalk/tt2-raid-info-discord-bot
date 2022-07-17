@@ -1,8 +1,6 @@
-import json
 import re
 
 import discord
-from requests import JSONDecodeError, Response
 
 BOT_AUTHOR = "pingu#4195"
 BOT_USER = "TT2RaidSeedBot#1932"
@@ -39,16 +37,3 @@ def seed_identifier(from_msg_content: str) -> str:
     seed_date = matches.group(1).replace('/', '')
 
     return f"raid_seed_{seed_date}.json"
-
-
-# This should not exist here, high coupling
-def message_from_response(response: Response) -> str:
-    try:
-        data = response.json()
-
-        data = data.get("detail", json.dumps(data, indent=4))
-
-    except JSONDecodeError:
-        data = response.text
-
-    return f"{response.status_code=}: {data}"
