@@ -2,4 +2,5 @@
 
 disable = [
     "missing-docstring",
+    "broad-except"
 ]
