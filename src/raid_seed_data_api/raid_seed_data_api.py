@@ -3,7 +3,7 @@ from typing import Any, Callable
 import requests
 from requests import Response
 from src.domain.raid_seed_data_provider import RaidSeedDataProvider
-from src.model.seed_type import SeedType
+from src.domain.seed_type import SeedType
 
 
 class RaidSeedDataAPI(RaidSeedDataProvider):

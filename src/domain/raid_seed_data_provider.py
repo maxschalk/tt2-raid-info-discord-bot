@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 # pylint: disable=import-error
-from src.model.seed_type import SeedType
+from src.domain.seed_type import SeedType
 
 
 class RaidSeedDataProvider(ABC):

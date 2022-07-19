@@ -1,10 +1,12 @@
-from dotenv import load_dotenv
+from enum import Enum
 
-from src.model.stage import Stage
-from src.utils import get_env
+from src.utils.get_env import get_env
 
-load_dotenv()
+
+class Stage(Enum):
+    DEV = "dev"
+    STAGING = "staging"
+    PRODUCTION = "prod"
+
 
 STAGE = Stage(get_env(key='STAGE', strict=False) or Stage.PRODUCTION.value)
-
-print(f"{STAGE=}")

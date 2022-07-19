@@ -4,7 +4,7 @@ import json
 import discord
 from discord.ext import commands
 from src.bot.bot_process_messages import factory_process_existing_messages
-from src.model.seed_type import SeedType
+from src.domain.seed_type import SeedType
 
 
 def add_domain_commands(*, bot, process_context, data_provider):
