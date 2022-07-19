@@ -17,7 +17,7 @@ def main():
         for file in os.listdir(hooks_dir):
             path = os.path.join(hooks_dir, file)
             file_stat = os.stat(path)
-            os.chmod(path, file_stat | stat.S_IEXEC)
+            os.chmod(path, file_stat.st_mode | stat.S_IEXEC)
 
     cmd = ("git", "config", "core.hooksPath", hooks_dir)
 
