@@ -1,3 +1,5 @@
+import os
+import stat
 import subprocess
 import sys
 
@@ -9,6 +11,13 @@ def main():
         hooks_dir = sys.argv[1]
     except IndexError:
         hooks_dir = DEFAULT_DIR
+
+    # unix: make hooks executable
+    if 'darwin' in sys.platform or 'linux' in sys.platform:
+        for file in os.listdir(hooks_dir):
+            path = os.path.join(hooks_dir, file)
+            file_stat = os.stat(path)
+            os.chmod(path, file_stat | stat.S_IEXEC)
 
     cmd = ("git", "config", "core.hooksPath", hooks_dir)
 
