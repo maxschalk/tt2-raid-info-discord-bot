@@ -54,7 +54,7 @@ def factory_process_existing_messages(
 
     process_message = factory_process_message(data_provider=data_provider)
 
-    async def process_existing_messages(*, channel: discord.Channel) -> None:
+    async def process_existing_messages(*, channel: discord.channel) -> None:
         async for msg in channel.history():
 
             if await msg_is_handled(msg=msg):

@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Collection
 
 import discord
 from discord.ext import commands
@@ -28,7 +28,7 @@ def setup_bot(*, bot: commands.Bot, guild_name: str, channel_name: str,
                         data_provider=data_provider)
 
 
-def factory_get_guild(*, bot, guild_name) -> Callable:
+def factory_get_guild(*, bot: commands.bot, guild_name: str) -> Callable:
     return lambda: discord.utils.get(bot.guilds, name=guild_name)
 
 
@@ -60,7 +60,8 @@ def factory_process_context(*, get_guild: Callable,
     return process_context
 
 
-def _validate_context(*, context, guild, target_channels) -> bool:
+def _validate_context(*, context, guild: discord.Guild,
+                      target_channels: Collection[str]) -> bool:
     if context.guild != guild:
         raise commands.CommandError("This command does not work in this guild")
 
