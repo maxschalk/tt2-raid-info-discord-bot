@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 from src.bot.bot import setup_bot
-from src.raid_seed_data_api.raid_seed_data_api import RaidSeedDataAPI
+from src.domain.raid_seed_data_api import RaidSeedDataAPI
 from src.stage import STAGE
 from src.utils.get_env import get_env
 
