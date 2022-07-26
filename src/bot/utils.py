@@ -19,28 +19,28 @@ def full_username(*, user: discord.User) -> str:
 
 
 def is_relevant_message(*, msg: discord.Message) -> bool:
-    return has_relevant_author(msg=msg) and is_raid_seed_message(msg=msg)
+    return _has_relevant_author(msg=msg) and _is_raid_seed_message(msg=msg)
 
 
-def has_relevant_author(*, msg: discord.Message) -> bool:
+def _has_relevant_author(*, msg: discord.Message) -> bool:
     author_name = full_username(user=msg.author)
 
     return author_name in {RAID_SEED_AUTHOR_USERNAME, BOT_AUTHOR_USERNAME}
 
 
-def is_raid_seed_message(*, msg: discord.Message) -> bool:
+def _is_raid_seed_message(*, msg: discord.Message) -> bool:
     return REGEX_CONTENT.match(msg.content)
 
 
-def seed_identifier(*, from_msg_content: str) -> str:
+def seed_identifier_from_msg(*, from_msg_content: str) -> str:
     matches = REGEX_CONTENT.match(from_msg_content)
 
     seed_date = matches.group(1).replace('/', '')
 
-    return f"raid_seed_{seed_date}.json"
+    return f"raid_seed_{seed_date}"
 
 
-async def is_handled(*, msg: discord.Message):
+async def msg_is_handled(*, msg: discord.Message):
     for reaction in msg.reactions:
         if reaction.emoji not in {EMOJI_CHECK_MARK, EMOJI_RED_CROSS}:
             return False
