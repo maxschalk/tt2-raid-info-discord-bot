@@ -34,16 +34,17 @@ def factory_get_guild(*, bot, guild_name) -> Callable:
 
 def factory_get_channel(*, channel_name: str) -> Callable:
 
-    def func(*, guild):
+    def get_channel(*, guild: discord.Guild):
         if not guild:
             return None
 
         return discord.utils.get(guild.text_channels, name=channel_name)
 
-    return func
+    return get_channel
 
 
-def factory_process_context(*, get_guild, get_channel):
+def factory_process_context(*, get_guild: Callable,
+                            get_channel: Callable) -> Callable:
 
     async def process_context(*, context):
         guild = get_guild()

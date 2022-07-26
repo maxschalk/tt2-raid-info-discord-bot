@@ -1,13 +1,16 @@
 import io
 import json
+from typing import Callable
 
 import discord
 from discord.ext import commands
 from src.bot.bot_process_messages import factory_process_existing_messages
+from src.domain.raid_seed_data_provider import RaidSeedDataProvider
 from src.domain.seed_type import SeedType
 
 
-def add_domain_commands(*, bot, process_context, data_provider):
+def add_domain_commands(*, bot: commands.bot, process_context: Callable,
+                        data_provider: RaidSeedDataProvider):
 
     bot.add_command(
         factory_process_existing(process_context=process_context,
@@ -23,26 +26,29 @@ def add_domain_commands(*, bot, process_context, data_provider):
                             data_provider=data_provider))
 
 
-def factory_process_existing(*, process_context, data_provider):
+def factory_process_existing(*, process_context: Callable,
+                             data_provider: RaidSeedDataProvider) -> Callable:
 
     process_existing_messages = factory_process_existing_messages(
         data_provider=data_provider)
 
     @commands.has_role('admin')
     @commands.command(name='process', aliases=['p'])
-    async def func(context):
+    async def process_existing(context):
         await process_context(context=context)
 
         await process_existing_messages(channel=context.channel)
 
-    return func
+    return process_existing
 
 
-def factory_get_seed_identifiers(*, process_context, data_provider):
+def factory_get_seed_identifiers(
+        *, process_context: Callable,
+        data_provider: RaidSeedDataProvider) -> Callable:
 
-    async def get_seed_identifiers(*,
-                                   context,
-                                   count: int = None) -> list[str] | str:
+    async def _get_seed_identifiers(*,
+                                    context,
+                                    count: int = None) -> list[str] | str:
 
         try:
             data = data_provider.list_seed_identifiers()
@@ -60,18 +66,19 @@ def factory_get_seed_identifiers(*, process_context, data_provider):
 
     @commands.has_role('admin')
     @commands.command(name='seed-identifiers', aliases=['sids'])
-    async def func(context, count: int = None):
+    async def get_seed_identifiers(context, count: int = None) -> None:
         await process_context(context=context)
 
-        await get_seed_identifiers(context=context, count=count)
+        await _get_seed_identifiers(context=context, count=count)
 
-    return func
+    return get_seed_identifiers
 
 
-def factory_get_seed_data(*, process_context, data_provider):
+def factory_get_seed_data(*, process_context: Callable,
+                          data_provider: RaidSeedDataProvider) -> Callable:
 
-    async def get_seed_data(*, context, identifier: str,
-                            seed_type: SeedType) -> tuple[str, str]:
+    async def _get_seed_data(*, context, identifier: str,
+                             seed_type: SeedType) -> tuple[str, str]:
 
         try:
             data = data_provider.get_seed(identifier=identifier,
@@ -85,21 +92,22 @@ def factory_get_seed_data(*, process_context, data_provider):
 
     @commands.has_role('admin')
     @commands.command(name='seed', aliases=['s'])
-    async def func(context,
-                   identifier: str,
-                   seed_type: SeedType = SeedType.RAW):
+    async def get_seed_data(context,
+                            identifier: str,
+                            seed_type: SeedType = SeedType.RAW) -> None:
         await process_context(context=context)
 
-        await get_seed_data(context=context,
-                            identifier=identifier,
-                            seed_type=seed_type)
+        await _get_seed_data(context=context,
+                             identifier=identifier,
+                             seed_type=seed_type)
 
-    return func
+    return get_seed_data
 
 
-def factory_delete_seed(*, process_context, data_provider):
+def factory_delete_seed(*, process_context: Callable,
+                        data_provider: RaidSeedDataProvider) -> Callable:
 
-    async def _delete_seed(*, context, identifier: str):
+    async def _delete_seed(*, context, identifier: str) -> None:
 
         try:
             data_provider.delete_seed(identifier=identifier)
@@ -111,9 +119,9 @@ def factory_delete_seed(*, process_context, data_provider):
 
     @commands.has_role('admin')
     @commands.command(name='delete-seed', aliases=['ds'])
-    async def func(context, identifier: str):
+    async def delete_seed(context, identifier: str) -> None:
         await process_context(context=context)
 
         await _delete_seed(context=context, identifier=identifier)
 
-    return func
+    return delete_seed

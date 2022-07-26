@@ -1,13 +1,15 @@
+from typing import Callable
+
 from discord.ext import commands
 
 
-def add_meta_commands(*, bot, process_context):
+def add_meta_commands(*, bot: commands.bot, process_context: Callable) -> None:
     bot.add_command(
         factory_delete_recent_messages(process_context=process_context))
     bot.add_command(factory_clear_reactions(process_context=process_context))
 
 
-def factory_delete_recent_messages(*, process_context):
+def factory_delete_recent_messages(*, process_context: Callable) -> Callable:
 
     @commands.has_role('admin')
     @commands.command(name='delete-messages', aliases=['del'])
@@ -19,7 +21,7 @@ def factory_delete_recent_messages(*, process_context):
     return func
 
 
-def factory_clear_reactions(*, process_context):
+def factory_clear_reactions(*, process_context: Callable) -> Callable:
 
     @commands.has_role('admin')
     @commands.command(name='clear-reactions', aliases=['cr'])
@@ -32,7 +34,7 @@ def factory_clear_reactions(*, process_context):
     return func
 
 
-async def _delete_recent_messages(*, context, count: int = 1):
+async def _delete_recent_messages(*, context, count: int = 1) -> None:
     if count <= 0:
         raise commands.BadArgument("Argument [count] must be greater than 0")
 
@@ -44,7 +46,7 @@ async def _delete_recent_messages(*, context, count: int = 1):
     print(f"Deleted {count} messages in #{context.channel.name}")
 
 
-async def _clear_reactions(*, context, count: int = 1):
+async def _clear_reactions(*, context, count: int = 1) -> None:
 
     if count <= 0:
         raise commands.BadArgument("Argument [count] must be greater than 0")

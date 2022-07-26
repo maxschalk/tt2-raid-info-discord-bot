@@ -1,12 +1,17 @@
 from contextlib import suppress
+from typing import Callable
 
 import discord
+from discord.ext import commands
 from src.bot.bot_process_messages import (factory_process_existing_messages,
                                           factory_process_message)
 from src.bot.utils import full_username
+from src.domain.raid_seed_data_provider import RaidSeedDataProvider
 
 
-def add_event_listeners(*, bot, get_guild, get_channel, data_provider):
+def add_event_listeners(*, bot: commands.bot, get_guild: Callable,
+                        get_channel: Callable,
+                        data_provider: RaidSeedDataProvider) -> None:
     bot.add_listener(
         factory_on_ready(bot=bot,
                          get_guild=get_guild,
@@ -16,7 +21,9 @@ def add_event_listeners(*, bot, get_guild, get_channel, data_provider):
     bot.add_listener(factory_on_message(bot=bot, data_provider=data_provider))
 
 
-def factory_on_ready(*, bot, get_guild, get_channel, data_provider):
+def factory_on_ready(*, bot: commands.bot, get_guild: Callable,
+                     get_channel: Callable,
+                     data_provider: RaidSeedDataProvider) -> Callable:
 
     process_existing_messages = factory_process_existing_messages(
         data_provider=data_provider)
@@ -44,7 +51,8 @@ def factory_on_ready(*, bot, get_guild, get_channel, data_provider):
     return on_ready
 
 
-def factory_on_message(*, bot, data_provider):
+def factory_on_message(*, bot: commands.bot,
+                       data_provider: RaidSeedDataProvider) -> Callable:
 
     process_message = factory_process_message(data_provider=data_provider)
 

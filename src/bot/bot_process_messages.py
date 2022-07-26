@@ -1,16 +1,19 @@
 import json
 from contextlib import suppress
+from typing import Callable
 
+import discord
 import requests
 from src.bot.utils import (BOT_USERNAME, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
-                           full_username, msg_is_handled, is_relevant_message,
+                           full_username, is_relevant_message, msg_is_handled,
                            seed_identifier_from_msg, throw_err_on_msg)
 from src.domain.raid_seed_data_provider import RaidSeedDataProvider
 
 
-def factory_process_message(*, data_provider: RaidSeedDataProvider):
+def factory_process_message(*,
+                            data_provider: RaidSeedDataProvider) -> Callable:
 
-    async def process_message(*, msg):
+    async def process_message(*, msg: discord.Message) -> None:
         if not is_relevant_message(msg=msg):
             return
 
@@ -46,11 +49,12 @@ def factory_process_message(*, data_provider: RaidSeedDataProvider):
     return process_message
 
 
-def factory_process_existing_messages(*, data_provider: RaidSeedDataProvider):
+def factory_process_existing_messages(
+        *, data_provider: RaidSeedDataProvider) -> Callable:
 
     process_message = factory_process_message(data_provider=data_provider)
 
-    async def process_existing_messages(*, channel):
+    async def process_existing_messages(*, channel: discord.Channel) -> None:
         async for msg in channel.history():
 
             if await msg_is_handled(msg=msg):
