@@ -1,13 +1,14 @@
 import asyncio
 from dataclasses import dataclass
-from unittest.mock import Mock
+from typing import Iterable
+from unittest.mock import MagicMock
 
 import pytest
 
 from .utils import (BOT_AUTHOR_USERNAME, BOT_USERNAME, EMOJI_CHECK_MARK,
                     EMOJI_RED_CROSS, USERNAME_SEPARATOR, _has_relevant_author,
-                    _is_raid_seed_message, full_username, msg_is_handled,
-                    seed_identifier_from_msg, throw_err_on_msg)
+                    _is_raid_seed_message, full_username, is_relevant_message,
+                    msg_is_handled, seed_identifier_from_msg, throw_err_on_msg)
 
 
 class AsyncIterator:
@@ -25,7 +26,6 @@ class AsyncIterator:
         try:
             return next(self.iterator)
         except StopIteration:
-            # pylint: disable=raise-missing-from
             raise StopAsyncIteration
 
 
@@ -39,13 +39,25 @@ class MockUser:
 class MockReaction:
     emoji: str = "X"
 
-    # pylint: disable=invalid-name
     me: bool = False
 
     _users: tuple[MockUser] = tuple()
 
     def users(self):
         return AsyncIterator(self._users)
+
+
+@dataclass
+class MockMessage:
+    author: MockUser = None
+    content: str = ""
+    reactions: Iterable[MockReaction] = None
+
+    async def add_reaction(self, *args, **kwargs):
+        return _async_return(None)
+
+    async def reply(self, *args, **kwargs):
+        return _async_return(None)
 
 
 def _async_return(result):
@@ -63,7 +75,7 @@ def test_full_username():
     )
 
     for display_name, discriminator in cases:
-        user = Mock(display_name=display_name, discriminator=discriminator)
+        user = MockUser(display_name=display_name, discriminator=discriminator)
 
         actual = full_username(user=user)
         expected = f"{display_name}{USERNAME_SEPARATOR}{discriminator}"
@@ -71,8 +83,9 @@ def test_full_username():
         assert actual == expected
 
 
-def test_has_relevant_author():
-    cases = (
+def test_message_relevance():
+
+    author_cases = (
         (BOT_AUTHOR_USERNAME.split(USERNAME_SEPARATOR), True),
         (("GameHive #raid-seed-export", "0000"), True),
         (BOT_USERNAME.split(USERNAME_SEPARATOR), False),
@@ -82,17 +95,7 @@ def test_has_relevant_author():
         (("", ""), False),
     )
 
-    for (display_name, discriminator), expected in cases:
-        user = Mock(display_name=display_name, discriminator=discriminator)
-        msg = Mock(author=user)
-
-        actual = _has_relevant_author(msg=msg)
-
-        assert actual == expected
-
-
-def test_is_raid_seed_message():
-    cases = (
+    message_cases = (
         ("Raid seed export - 0000/00/00", True),
         ("Raid seed export - 1234/56/78", True),
         ("SRaid seed export - 1234/56/78", False),
@@ -104,12 +107,28 @@ def test_is_raid_seed_message():
         ("Raid seed export - abcd/ef/gh", False),
     )
 
-    for content, expected in cases:
-        msg = Mock(content=content)
+    for (display_name, discriminator), expected_author in author_cases:
 
-        actual = _is_raid_seed_message(msg=msg)
+        user = MockUser(display_name=display_name, discriminator=discriminator)
+        msg = MockMessage(author=user)
 
-        assert actual == expected
+        actual = _has_relevant_author(msg=msg)
+
+        assert actual == expected_author
+
+        for content, expected_message in message_cases:
+            msg = MockMessage(content=content)
+
+            actual = _is_raid_seed_message(msg=msg)
+
+            assert actual == expected_message
+
+            msg = MockMessage(author=user, content=content)
+
+            actual = is_relevant_message(msg=msg)
+            expected = expected_author and expected_message
+
+            assert actual == expected
 
 
 def test_seed_identifier_from_msg():
@@ -136,21 +155,25 @@ async def test_msg_is_handled():
     cases = (
         # no reactions
         Case(expected=False),
+
         # irrelevant reaction by bot
         Case(
             expected=False,
             reactions=(MockReaction(me=True), ),
         ),
+
         # relevant reaction by irrelevant user
         Case(
             expected=False,
             reactions=(MockReaction(emoji=EMOJI_CHECK_MARK), ),
         ),
+
         # relevant reaction by bot
         Case(
             expected=True,
             reactions=(MockReaction(emoji=EMOJI_CHECK_MARK, me=True), ),
         ),
+
         # relevant reaction by bot as number 2
         Case(
             expected=True,
@@ -159,6 +182,7 @@ async def test_msg_is_handled():
                 MockReaction(emoji=EMOJI_CHECK_MARK, me=True),
             ),
         ),
+
         # relevant reaction by bot author
         Case(
             expected=True,
@@ -167,6 +191,7 @@ async def test_msg_is_handled():
                 _users=(MockUser(
                     *BOT_AUTHOR_USERNAME.split(USERNAME_SEPARATOR)), )), ),
         ),
+
         # relevant reaction by bot author as number 2
         Case(
             expected=True,
@@ -180,9 +205,7 @@ async def test_msg_is_handled():
     )
 
     for case in cases:
-        msg = Mock()
-
-        msg.reactions = case.reactions
+        msg = MockMessage(reactions=case.reactions)
 
         actual = await msg_is_handled(msg=msg)
 
@@ -192,25 +215,26 @@ async def test_msg_is_handled():
 @pytest.mark.asyncio
 async def test_throw_err_on_msg():
     cases = (
-        "error text",
-        "",
-        None,
+        {
+            "text": "error text"
+        },
+        {
+            "text": ""
+        },
+        {},
     )
 
-    for text in cases:
-        msg = Mock()
+    for kwargs in cases:
+        msg = MockMessage()
 
-        msg.add_reaction.return_value = _async_return(None)
-        msg.reply.return_value = _async_return(None)
+        msg.add_reaction = MagicMock(return_value=_async_return(None))
+        msg.reply = MagicMock(return_value=_async_return(None))
 
-        if text is None:
-            await throw_err_on_msg(msg=msg)
-        else:
-            await throw_err_on_msg(msg=msg, text=text)
+        await throw_err_on_msg(msg=msg, **kwargs)
 
         msg.add_reaction.assert_called_once_with(emoji=EMOJI_RED_CROSS)
 
-        if text:
+        if text := kwargs.get("text", None):
             msg.reply.assert_called_once_with(text)
         else:
             msg.reply.assert_not_called()
