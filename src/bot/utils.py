@@ -13,7 +13,7 @@ REGEX_CONTENT = re.compile("^Raid seed export - ([0-9]{4}/[0-9]{2}/[0-9]{2})$")
 
 EMOJI_CHECK_MARK = "✅"
 EMOJI_RED_CROSS = "❌"
-EMOJI_PENGUIN = "🐧"
+# EMOJI_PENGUIN = "🐧"
 
 
 def full_username(*, user: discord.User) -> str:
