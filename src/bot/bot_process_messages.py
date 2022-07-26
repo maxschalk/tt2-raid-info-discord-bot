@@ -2,7 +2,7 @@ import json
 from contextlib import suppress
 
 import requests
-from src.bot.utils import (BOT_USER, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
+from src.bot.utils import (BOT_USERNAME, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
                            full_username, is_handled, is_relevant_message,
                            seed_identifier, throw_err_on_msg)
 from src.domain.raid_seed_data_provider import RaidSeedDataProvider
@@ -56,7 +56,7 @@ def factory_process_existing_messages(*, data_provider: RaidSeedDataProvider):
             if await is_handled(msg=msg):
                 return
 
-            if full_username(user=msg.author) == BOT_USER:
+            if full_username(user=msg.author) == BOT_USERNAME:
                 await msg.delete()
 
             with suppress(RuntimeError):

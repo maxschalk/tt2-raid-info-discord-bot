@@ -1,11 +1,11 @@
 import re
 
 import discord
+from src.utils.get_env import get_env
 
-# Move to .env
-BOT_AUTHOR = "pingu#4195"
-BOT_USER = "TT2RaidSeedBot#1932"
-SEED_AUTHOR = "GameHive #raid-seed-export#0000"
+BOT_AUTHOR_USERNAME = get_env(key="DISCORD_BOT_AUTHOR_USERNAME")
+BOT_USERNAME = get_env(key="DISCORD_BOT_USERNAME")
+RAID_SEED_AUTHOR_USERNAME = get_env(key="DISCORD_RAID_SEED_AUTHOR_USERNAME")
 
 REGEX_CONTENT = re.compile("^Raid seed export - ([0-9]{4}/[0-9]{2}/[0-9]{2})$")
 
@@ -25,7 +25,7 @@ def is_relevant_message(*, msg: discord.Message) -> bool:
 def has_relevant_author(*, msg: discord.Message) -> bool:
     author_name = full_username(user=msg.author)
 
-    return author_name in {SEED_AUTHOR, BOT_AUTHOR}
+    return author_name in {RAID_SEED_AUTHOR_USERNAME, BOT_AUTHOR_USERNAME}
 
 
 def is_raid_seed_message(*, msg: discord.Message) -> bool:
@@ -49,7 +49,7 @@ async def is_handled(*, msg: discord.Message):
             return True
 
         if any(
-                full_username(user=user) == BOT_AUTHOR
+                full_username(user=user) == BOT_AUTHOR_USERNAME
                 async for user in reaction.users()):
             return True
 
