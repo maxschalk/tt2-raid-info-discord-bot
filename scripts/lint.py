@@ -6,8 +6,7 @@ from ._run_script import run_script
 
 def get_cmds(*, paths):
     if not paths:
-        return (("pylint", ".", "--recursive", "y", "--ignore-patterns",
-                 "venv"), )
+        return (("pylint", ".", "--recursive", "y"), )
 
     return (("pylint", path) for path in paths)
 

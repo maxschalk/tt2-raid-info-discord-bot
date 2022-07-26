@@ -4,3 +4,6 @@ disable = [
     "missing-docstring",
     "broad-except"
 ]
+
+ignore-paths="venv"
+ignore-patterns=".*_test.py"
