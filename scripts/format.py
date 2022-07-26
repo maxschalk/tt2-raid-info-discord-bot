@@ -1,4 +1,4 @@
-from .run_script import run_script
+from ._run_script import run_script
 
 
 def get_cmds(*, paths):

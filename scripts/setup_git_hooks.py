@@ -12,7 +12,7 @@ def main():
     except IndexError:
         hooks_dir = DEFAULT_DIR
 
-    # unix: make hooks executable
+    # make hooks executable on unix
     if 'darwin' in sys.platform or 'linux' in sys.platform:
         for file in os.listdir(hooks_dir):
             path = os.path.join(hooks_dir, file)
