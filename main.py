@@ -10,7 +10,9 @@ DISCORD_CHANNEL_NAME = get_env(key="DISCORD_CHANNEL_NAME")
 
 DISCORD_BOT_TOKEN = get_env(key='DISCORD_BOT_TOKEN')
 
-DATA_PROVIDER = RaidSeedDataAPI()
+DATA_PROVIDER = RaidSeedDataAPI(
+    base_url=get_env(key="RAID_SEED_DATA_API_BASE_URL"),
+    auth_key=get_env(key="RAID_SEED_DATA_API_AUTH_SECRET"))
 
 
 def main():

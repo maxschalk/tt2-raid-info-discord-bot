@@ -4,18 +4,16 @@ import requests
 from requests import Response
 from src.domain.raid_seed_data_provider import RaidSeedDataProvider
 from src.domain.seed_type import SeedType
-from src.utils.get_env import get_env
 
 
 class RaidSeedDataAPI(RaidSeedDataProvider):
 
-    def __init__(self, *, base_url: str = None, auth_key: str = None) -> None:
+    def __init__(self, *, base_url: str, auth_key: str) -> None:
         super().__init__()
 
-        self.base_url = base_url or get_env(key="RAID_SEED_DATA_API_BASE_URL")
+        self.base_url = base_url
 
-        self.auth_key = auth_key or get_env(
-            key="RAID_SEED_DATA_API_AUTH_SECRET")
+        self.auth_key = auth_key
 
         self.request_headers = {
             "secret": auth_key,
