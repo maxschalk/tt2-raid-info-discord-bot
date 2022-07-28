@@ -56,6 +56,8 @@ After a few seconds you should also see the bot user displayed among the online 
 
 ### Commands
 
+By default all commands require the user to have an 'admin' role.
+
 - [!help]: display a list of all commands
 - [!clear-reactions | !cr] [count: int = 1]: clear the reactions on a specified number of recent messages
 - [!delete-messages | !del] [count: int = 1]: delete a specified number of recent messages
