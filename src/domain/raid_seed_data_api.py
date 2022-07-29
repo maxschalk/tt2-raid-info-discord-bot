@@ -43,7 +43,7 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
 
         response = self._make_api_request(
             method=requests.get,
-            path=f"admin/all_seed_filenames/{seed_type.value}")
+            path=f"admin/seed_identifiers/{seed_type.value}")
 
         return response.json()
 
@@ -51,7 +51,7 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
                   data: str) -> None:
 
         self._make_api_request(method=requests.post,
-                               path=f"admin/raw_seed_file/{identifier}",
+                               path=f"admin/save/{identifier}",
                                data=data)
 
     def get_seed(
@@ -63,7 +63,7 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
 
         response = self._make_api_request(
             method=requests.get,
-            path=f"admin/seed_file/{seed_type.value}/{identifier}")
+            path=f"admin/seed/{seed_type.value}/{identifier}")
 
         return response.json()
 
@@ -73,8 +73,8 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
         identifier: str,
     ) -> None:
 
-        response = self._make_api_request(
-            method=requests.delete, path=f"admin/raw_seed_file/{identifier}")
+        response = self._make_api_request(method=requests.delete,
+                                          path=f"admin/delete/{identifier}")
 
         data = response.json()
 
