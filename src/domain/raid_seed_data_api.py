@@ -50,16 +50,9 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
     def save_seed(self: RaidSeedDataProvider, *, identifier: str,
                   data: str) -> None:
 
-        response = self._make_api_request(method=requests.post,
-                                          path=f"admin/save/{identifier}",
-                                          data=data)
-
-        response_data = response.json()
-
-        if not response_data.get("success", False):
-            raise ValueError(
-                f"Seed {identifier} was not created: {response_data.get('detail', response_data)}"
-            )
+        self._make_api_request(method=requests.post,
+                               path=f"admin/save/{identifier}",
+                               data=data)
 
     def get_seed(
         self: RaidSeedDataProvider,
@@ -80,12 +73,5 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
         identifier: str,
     ) -> None:
 
-        response = self._make_api_request(method=requests.delete,
-                                          path=f"admin/delete/{identifier}")
-
-        response_data = response.json()
-
-        if not response_data.get("success", False):
-            raise ValueError(
-                f"Seed {identifier} was not deleted: {response_data.get('detail', response_data)}"
-            )
+        self._make_api_request(method=requests.delete,
+                               path=f"admin/delete/{identifier}")
