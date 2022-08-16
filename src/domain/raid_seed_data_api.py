@@ -1,5 +1,4 @@
-from ctypes import Union
-from typing import Any, Callable
+from typing import Any, Callable, Union
 
 import requests
 from requests import Response
