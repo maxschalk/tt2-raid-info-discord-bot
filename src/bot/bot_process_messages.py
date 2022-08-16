@@ -40,6 +40,8 @@ def factory_process_message(*,
         try:
             data_provider.save_seed(identifier=identifier,
                                     data=json.dumps(data))
+
+            data_provider.delete_seeds_older_than(days=14)
         except Exception as error:
             await throw_err_on_msg(msg=msg, text=f"Error saving seed: {error}")
             return

@@ -1,3 +1,4 @@
+from ctypes import Union
 from typing import Any, Callable
 
 import requests
@@ -75,3 +76,12 @@ class RaidSeedDataAPI(RaidSeedDataProvider):
 
         self._make_api_request(method=requests.delete,
                                path=f"admin/delete/{identifier}")
+
+    def delete_seeds_older_than(self: RaidSeedDataProvider,
+                                *,
+                                days: Union[int, None] = None) -> None:
+
+        query = "" if days is None else f"days={days}"
+
+        self._make_api_request(method=requests.delete,
+                               path=f"admin/delete_old?{query}")

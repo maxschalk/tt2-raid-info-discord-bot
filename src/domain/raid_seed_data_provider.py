@@ -36,3 +36,7 @@ class RaidSeedDataProvider(ABC):
         identifier: str,
     ) -> bool:
         pass
+
+    @abstractmethod
+    def delete_seeds_older_than(self, *, days: int = None) -> None:
+        pass
