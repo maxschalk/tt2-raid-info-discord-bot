@@ -4,6 +4,7 @@ from typing import Callable
 
 import discord
 import requests
+
 from src.bot.utils import (BOT_USERNAME, EMOJI_CHECK_MARK, EMOJI_RED_CROSS,
                            full_username, is_relevant_message, msg_is_handled,
                            seed_identifier_from_msg, throw_err_on_msg)
@@ -41,8 +42,17 @@ def factory_process_message(*,
             data_provider.save_seed(identifier=identifier,
                                     data=json.dumps(data))
 
-        except Exception as error:
-            await throw_err_on_msg(msg=msg, text=f"Error saving seed: {error}")
+        except (requests.exceptions.HTTPError, Exception) as error:
+            text = None
+            if (isinstance(error, requests.exceptions.HTTPError)
+                    and error.response.status_code == 409):
+
+                # pylint: disable=protected-access
+                text = json.loads(error.response._content)\
+                            .get("detail", "409 HTTP Conflict error")
+
+            await throw_err_on_msg(msg=msg,
+                                   text=text or f"Error saving seed: {error}")
             return
 
         with suppress(Exception):
